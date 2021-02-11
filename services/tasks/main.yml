@@ -5,5 +5,5 @@
   service:
     name: '{{ item.key }}'
     state: '{{ item.value }}'
-    enabled: '{{ item.value == "started" | ternary("yes", "no") }}'
+    enabled: '{{ item.value is match("started") | ternary("yes", "no") }}'
   loop: '{{ services | dict2items }}'
