@@ -1,0 +1,7 @@
+---
+- name: Configure locales
+  become: yes
+  locale_gen:
+    name: '{{ item }}'
+    state: present
+  with_items: '{{ locales }}'

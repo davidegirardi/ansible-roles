@@ -1,0 +1,6 @@
+---
+- name: Blacklist the nouveau driver module
+  become: yes
+  kernel_blacklist:
+    name: tps6598x
+    state: present

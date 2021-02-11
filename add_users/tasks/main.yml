@@ -1,0 +1,21 @@
+---
+- name: Add user accounts
+  become: yes
+  user:
+    name: '{{ item.key }}'
+    groups: '{{ item.value.groups }}'
+    create_home: yes
+    password: "{{ lookup('password', 'credentials/{{ item.key }}_initial_password chars=ascii_letters,digits length=32') | password_hash('sha512') }}"
+    shell: '{{ account_shell }}'
+    state: present
+    update_password: on_create
+  with_dict: '{{ accounts }}'
+
+- name: Add authorized_keys
+  become: yes
+  authorized_key:
+    user: '{{ item.key }}'
+    state: present
+    key: '{{ item.value.public_key }}'
+  when: item.value != None
+  with_dict: '{{ accounts }}'

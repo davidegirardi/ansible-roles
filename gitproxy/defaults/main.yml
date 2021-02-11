@@ -1,0 +1,5 @@
+gitproxy_user:
+  gitproxy:
+    public_key: "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+    groups:
+    shell: /usr/bin/git-shell

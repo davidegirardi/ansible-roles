@@ -1,0 +1,22 @@
+---
+
+- name: Pool repository
+  file:
+    path: '{{ vms.vars.disk_pool_directory }}'
+    state: directory
+    mode: 0700
+  register: pool
+
+- name: Copy disk template
+  copy:
+    src: '{{ vm_template_repo }}/{{ item.value.template_name }}.qcow2'
+    dest: '{{ vms.vars.disk_pool_directory }}/{{ item.key }}.qcow2'
+    force: no
+  loop: '{{ vms.hosts | dict2items }}'
+
+- name: Define VMs
+  virt:
+    command: define
+    xml: "{{ lookup('template', 'templates/' + item.value.os + '.xml') }}"
+    uri: '{{ libvirt_uri }}'
+  loop: '{{ vms.hosts | dict2items }}'

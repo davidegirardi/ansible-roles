@@ -1,0 +1,18 @@
+---
+- name: Check if office services are installed
+  win_service:
+    name: ose64
+  register: office_installed
+
+- name: Copy office installer
+  win_copy:
+    src: files/microsoft365installer.exe
+    dest: '{{ ansible_env.TEMP }}\microsoft365installer.exe'
+  register: installer
+  when: office_installed.state is not defined
+
+- name: Install
+  win_package:
+    path: '{{ ansible_env.TEMP }}\microsoft365installer.exe'
+    product_id: '{90160000-007E-0000-1000-0000000FF1CE}'
+

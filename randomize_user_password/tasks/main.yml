@@ -1,0 +1,15 @@
+---
+
+- name: Randomize user password
+  become: yes
+  user:
+    name: '{{ item.key }}'
+    password: "{{ lookup('password', 'credentials/temporarypassworddeleteme_QKPryzEiDqZZj1IMMM6NPGowmCDZKRuB chars=ascii_letters,digits length=32') | password_hash('sha512') }}"
+  with_dict: '{{ accounts }}'
+
+- name: Delete temporary password
+  become: no
+  delegate_to: localhost
+  file:
+    name: credentials/temporarypassworddeleteme_QKPryzEiDqZZj1IMMM6NPGowmCDZKRuB
+    state: absent

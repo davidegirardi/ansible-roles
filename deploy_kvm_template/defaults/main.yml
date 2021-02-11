@@ -1,0 +1,22 @@
+---
+
+# The host to use for deploying the machine
+kvm_host: localhost
+
+# Where to get the template disk files 
+vm_template_repo: '{{ ansible_env.HOME }}/packer_templates'
+
+libvirt_uri: qemu:///session
+
+# VMs
+vms:
+  debian_test.vm.projects:
+    os: linux
+    template_name: debian-10.6.0-amd64.qcow2
+    memory: 2048000
+    num_cpus: 2
+    net: virbr0
+  vars:
+    # Where to store the VMs
+    disk_pool_directory: '{{ ansible_env.HOME }}/kvm'
+

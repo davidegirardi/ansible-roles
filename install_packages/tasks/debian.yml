@@ -1,0 +1,12 @@
+---
+
+- name: Debian install packages
+  become: yes
+  apt:
+    policy_rc_d: 101
+    update_cache: yes
+    name: '{{ item.value }}'
+    state: '{{ item.key }}'
+    install_recommends: no
+    autoremove: yes
+  with_dict: '{{ packages }}'

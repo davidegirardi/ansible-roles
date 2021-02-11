@@ -1,0 +1,53 @@
+---
+kvm_networks:
+
+  trusted:
+    bridge: virbr1
+    dns_domain: vm.trusted
+    gw_ip: 192.168.133.1
+    netmask: 255.255.255.0
+    dhcp_from: 192.168.133.128
+    dhcp_to: 192.168.133.254
+    samba:
+      sharename: main
+      comment: GiRa
+      path: /home/gira/smbshare/
+      allow hosts: 192.168.133.0/24
+
+  projects:
+    bridge: virbr2
+    dns_domain: vm.projects
+    gw_ip: 192.168.166.1
+    netmask: 255.255.255.0
+    dhcp_from: 192.168.166.128
+    dhcp_to: 192.168.166.254
+    samba:
+      sharename: swap
+      comment: swap
+      path: /home/gira/.current_project/
+      allow hosts: 192.168.166.0/24
+
+  hostonly:
+    bridge: virbr3
+    dns_domain: vm.hostonly
+    gw_ip: 192.168.100.1
+    netmask: 255.255.255.0
+    dhcp_from: 192.168.100.128
+    dhcp_to: 192.168.100.254
+    isolated: yes
+
+samba_workgroup: WORKGROUP
+samba_interfaces: virbr*
+samba_global:
+  workgroup: '{{ samba_workgroup }}'
+  server string: KVM host
+  server role: standalone server
+  log file: /var/log/samba.%m
+  hosts deny: ALL
+  max log size: 50
+  passdb backend: tdbsam
+  interfaces: '{{ samba_interfaces }}'
+  bind interfaces only: 'yes'
+  dns proxy: 'no'
+  server min protocol: SMB3_11
+  smb encrypt: required

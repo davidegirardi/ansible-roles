@@ -1,0 +1,41 @@
+---
+
+- name: Get the current hostname
+  become: no
+  shell: |
+    hostnamectl | awk '/hostname:/ {print $NF}'
+  register: oldhostname
+  # Not needed, just to make ansible-lint happy :)
+  when: oldhostname is not defined
+
+- name: Regenerate sshd keys
+  become: yes
+  shell: |
+    rm /etc/ssh/ssh_host_*key*
+    dpkg-reconfigure openssh-server
+  when: oldhostname != newhostname and ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "Ubuntu"
+
+- name: Restart sshd
+  service:
+    name: sshd
+    state: restarted
+
+- name: 'Change to {{ newhostname }}'
+  become: yes
+  shell: |
+    hostnamectl set-hostname {{ newhostname }}
+  when: oldhostname != newhostname
+
+- name: Update /etc/hosts
+  lineinfile:
+    path: /etc/hosts
+    line: '127.0.0.1    {{ newhostname }}'
+
+- name: Reboot
+  become: yes
+  reboot:
+    reboot_timeout: 2
+  async: 1
+  poll: 0
+  failed_when: true == false
+  when: oldhostname != newhostname

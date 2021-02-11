@@ -1,0 +1,35 @@
+---
+- name: Install radare requirements
+  become: yes
+  apt:
+    pkg:
+      - build-essential
+      - ccache
+      - git
+      - libcapstone3
+
+- name: Temporary git stuff until ansible fixes force for the git module
+  become: no
+  shell: |
+    if [ -d pkg/radare2 ]
+    then
+      cd pkg/radare2
+      git fetch --tags -f
+    fi
+  changed_when: false
+  when: true
+
+- name: Get latest Radare source-code
+  become: no
+  git:
+    repo: https://github.com/radare/radare2.git
+    dest: pkg/radare2
+    force: yes
+  register: git
+
+- name: Compile/install radare2
+  become: no
+  shell: |
+    cd pkg/radare2/
+    bash sys/user.sh
+  when: git.after != git.before

@@ -1,0 +1,2 @@
+#path: '{{ ansible_env.HOME }}/.local/share/fonts/Font Awesome 5 Free-Regular-400.otf'
+installation_path: /usr/local/share/fonts/OTF

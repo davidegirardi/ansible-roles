@@ -1,0 +1,29 @@
+---
+
+- name: Save iptables state
+  become: yes
+  community.general.iptables_state:
+    ip_version: ipv4
+    state: saved
+    path: /etc/iptables/iptables.rules
+  listen: 'save_ip4tables'
+
+- name: Save ip6tables state
+  become: yes
+  community.general.iptables_state:
+    ip_version: ipv6
+    state: saved
+    path: /etc/iptables/ip6tables.rules
+  listen: 'save_ip6tables'
+
+- name: Enable and start iptables
+  service:
+    name: iptables
+    enabled: yes
+    state: started
+
+- name: Enable and start ip6tables
+  service:
+    name: ip6tables
+    enabled: yes
+    state: started

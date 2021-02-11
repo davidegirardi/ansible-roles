@@ -1,0 +1,7 @@
+---
+- name: Reload NetworkManager
+  become: yes
+  service:
+    name: NetworkManager
+    state: reloaded
+  listen: 'reload_networkmanager'

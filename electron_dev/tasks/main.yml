@@ -1,0 +1,31 @@
+---
+- name: Install Electron dependecies
+  become: yes
+  apt:
+    update_cache: yes
+    pkg:
+    - nodejs
+    - npm
+    - xterm
+    - xserver-xorg
+    - gvfs-bin
+    - kde-cli-tools
+    - kde-runtime
+    - libatk1.0-0
+    - libatk-bridge2.0-0
+    - libatspi2.0-0
+    - libdrm2
+    - libgbm1
+    - libgconf-2-4
+    - libgdk-pixbuf2.0-0
+    - libglib2.0-bin
+    - libgtk2.0-0
+    - libgtk-3-0
+    - libnotify4
+    - libnss3
+    - libuuid1
+    - libxcb-dri3-0
+    - libxss1
+    - libxtst6
+    - trash-cli
+    - xdg-utils

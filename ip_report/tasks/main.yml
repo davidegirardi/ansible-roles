@@ -1,0 +1,15 @@
+---
+- name: Install curl
+  become: yes
+  apt:
+    update_cache: yes
+    pkg: curl
+
+- name: Add ip_report cronjob
+  become: yes
+  template:
+    src: templates/ip_report
+    dest: /etc/cron.hourly/ip_report
+    owner: root
+    group: root
+    mode: 0755

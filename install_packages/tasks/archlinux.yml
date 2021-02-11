@@ -1,0 +1,15 @@
+---
+
+- name: Arch Linux upgrade all packages first
+  become: yes
+  pacman:
+    update_cache: yes
+    upgrade: yes
+
+- name: Arch Linux install packages
+  become: yes
+  pacman:
+    update_cache: no
+    name: '{{ item.value }}'
+    state: '{{ item.key }}'
+  with_dict: '{{ packages }}'

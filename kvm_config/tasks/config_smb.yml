@@ -1,0 +1,31 @@
+---
+
+- name: Configure global Samba settings
+  become: yes
+  ini_file:
+    path: /etc/samba/smb.conf
+    owner: root
+    group: root
+    mode: 0644
+    section: global
+    option: '{{ samba_config.key }}'
+    value: '{{ samba_config.value }}'
+  loop: '{{ samba_global | dict2items }}'
+  loop_control:
+    loop_var: samba_config
+  when: item.value.samba is defined
+
+- name: Configure Samba shares
+  become: yes
+  ini_file:
+    path: /etc/samba/smb.conf
+    owner: root
+    group: root
+    mode: 0644
+    section: '{{ item.value.samba.sharename }}'
+    option: '{{ samba_config.key }}'
+    value: '{{ samba_config.value }}'
+  loop: '{{ item.value.samba | dict2items }}'
+  loop_control:
+    loop_var: samba_config
+  when: item.value.samba is defined

@@ -1,0 +1,52 @@
+---
+- name: Install pwgen
+  vars:
+    packages:
+      present:
+      - pwgen
+  include_role:
+    name: install_packages
+
+- name: Add tunnel user
+  become: yes
+  user:
+    name: tunnel
+    shell: /bin/false
+
+- name: Configure sshd for tunnel
+  become: yes
+  blockinfile:
+    path: /etc/ssh/sshd_config
+    block: |
+      Match User tunnel
+        PasswordAuthentication yes
+        MaxSessions 1 
+        AllowTcpForwarding remote 
+        X11Forwarding no 
+        PermitTunnel no 
+        GatewayPorts no 
+        AllowAgentForwarding no 
+        ForceCommand echo 'This account can only be used for port forwarding'
+  register: sshd_config_updated
+
+- name: Restart sshd
+  become: yes
+  service:
+    name: sshd
+    state: restarted
+  when: sshd_config_updated.changed
+
+- name: Copy one-time password generation script
+  become: yes
+  copy:
+    src: ../files/tunnel_one_time_password.sh
+    dest: /usr/local/sbin/tunnel_one_time_password
+    mode: 0750
+
+
+- name: Copy Password generation script
+  become: yes
+  copy:
+    src: ../files/random_password.sh
+    dest: /usr/local/sbin/random_password
+    mode: 0750

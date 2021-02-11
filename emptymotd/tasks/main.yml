@@ -1,0 +1,9 @@
+---
+- name: Empty MOTD file
+  become: yes
+  copy:
+    content: ""
+    dest: /etc/motd
+    group: root
+    owner: root
+    mode: 0644

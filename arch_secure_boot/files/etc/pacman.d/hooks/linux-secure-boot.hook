@@ -1,0 +1,26 @@
+[Trigger]
+Type = Path
+Operation = Install
+Operation = Upgrade
+Operation = Remove
+Target = usr/lib/modules/*/vmlinuz
+Target = usr/lib/initcpio/*
+
+[Trigger]
+Type = Package
+Operation = Remove
+Target = mkinitcpio
+Target = mkinitcpio-git
+
+[Trigger]
+Operation = Install
+Operation = Upgrade
+Type = Package
+Target = linux
+Target = *ucode
+
+[Action]
+When = PostTransaction
+Exec = /usr/bin/bash /usr/local/sbin/kernel-signing-hook.sh /boot/vmlinuz-linux
+NeedsTargets
+

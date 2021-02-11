@@ -1,0 +1,47 @@
+---
+- name: Check if Font Awesome is installed
+  stat:
+    path: '{{ installation_path }}/Font Awesome 5 Free-Regular-400.otf'
+  register: font_already_installed
+
+- name: Install Font Awesome
+  block:
+    - name: Generate temporary file to download the font
+      tempfile:
+      register: fontfile
+
+    - name: Download Font Awesome
+      get_url:
+        force: yes
+        url: https://use.fontawesome.com/releases/v5.14.0/fontawesome-free-5.14.0-desktop.zip
+        dest: '{{ fontfile.path }}'
+
+    - name: Generate temporary directory to extract the font
+      tempfile:
+        state: directory
+      register: extract_dir
+
+    - name: Extract the font
+      unarchive:
+        copy: no
+        src: '{{ fontfile.path }}'
+        dest: '{{ extract_dir.path }}'
+
+    - name: Install the font
+      become: yes
+      copy:
+        src: '{{ extract_dir.path }}/fontawesome-free-5.14.0-desktop/otfs/'
+        dest: '{{ installation_path }}'
+
+    - name: Remove REAMDE.md
+      become: yes
+      file:
+        path: '{{ installation_path }}/REAMDE.md'
+        state: absent
+
+    - name: Update font cache
+      become: yes
+      shell: fc-cache -f
+      when: font_already_installed.stat.isreg is not defined
+
+  when: font_already_installed.stat.isreg is not defined

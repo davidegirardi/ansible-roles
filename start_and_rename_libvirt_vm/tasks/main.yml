@@ -1,0 +1,37 @@
+---
+
+- name: Start and rename Linux vm
+  shell: |
+    vm="{{ item.key }}"
+
+    # virsh command
+    VIRSH='virsh -c {{ libvirt_uri }}'
+
+    # Renaming VMs changes the host key too we need to ignore the ssh fingerprint
+    export ANSIBLE_HOST_KEY_CHECKING=False 
+
+    # Start the VM
+    $VIRSH start --domain $vm || true
+
+    # Wait for the VM
+    until ping -c1 "$vm" || ping -c1 "{{ item.value.initial_name }}.{{ item.value.domain}}"
+    do
+        sleep 1
+    done
+    # Needs refactoring
+    if ping -c1 "${vm}" &> /dev/null
+    then
+      target="$vm"
+    else
+      target="{{ item.value.initial_name}}.{{ item.value.domain}}"
+    fi
+    if [ "$target" == "$vm" ]
+    then
+        echo "$vm is already configured"
+    else
+        ansible-playbook -i "{{ item.value.initial_name}}.{{ item.value.domain}}," -u user --extra-vars "newhostname=$vm host_key_checking=no" "{{ role_path }}/../../rename.yml"
+    fi
+  when: item.value.os == 'linux'
+  register: renameout
+  changed_when: '"\"changed\": true" in renameout.stdout'
+  loop: '{{ vms.hosts | dict2items }}'

@@ -1,0 +1,59 @@
+---
+
+- name: 'Create shared paths for {{ sharing_group }}'
+  become: yes
+  file:
+    # chattr
+    # attributes:
+    path: '{{ item }}'
+    owner: root
+    group: '{{ sharing_group }}'
+    mode: u,g=rws,o=-rwx
+    state: directory
+  with_items: '{{ shared_paths }}'
+
+- name: Set default group ACL
+  become: yes
+  acl:
+    path: '{{ item }}'
+    recursive: yes
+    state: present
+    entity: '{{ sharing_group }}'
+    etype: group
+    permissions: rwX
+    default: yes
+  with_items: '{{ shared_paths }}'
+
+- name: Set group ACL for current items
+  become: yes
+  acl:
+    path: '{{ item }}'
+    recursive: yes
+    state: present
+    entity: '{{ sharing_group }}'
+    etype: group
+    permissions: rwX
+  with_items: '{{ shared_paths }}'
+
+- name: Create permission fixing cronjob
+  become: yes
+  template:
+    src: templates/fix_shared_resources_permissions.sh
+    dest: /etc/cron.daily/
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Populate owner group changes
+  become: yes
+  lineinfile:
+    path: /etc/cron.daily/fix_shared_resources_permissions.sh
+    line: 'chown -R root:{{ sharing_group }} {{ item }}'
+  with_items: '{{ shared_paths }}'
+
+- name: Populate permissions
+  become: yes
+  lineinfile:
+    path: /etc/cron.daily/fix_shared_resources_permissions.sh
+    line: setfacl -Rm d:g:{{ sharing_group }}:rwX,g:{{ sharing_group }}:rwX '{{ item }}'
+  with_items: '{{ shared_paths }}'

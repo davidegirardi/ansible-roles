@@ -1,0 +1,7 @@
+---
+
+- include: debian.yml
+  when: ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "Ubuntu"
+
+- include: archlinux.yml
+  when: ansible_facts['os_family'] == "Archlinux"

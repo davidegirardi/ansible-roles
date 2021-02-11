@@ -1,0 +1,72 @@
+{
+  "builders": [
+    {
+      "accelerator": "kvm",
+      "boot_command": [
+          {% raw %}"curl http://{{ .HTTPIP }}:{{ .HTTPPort }}/arch_install.sh -o arch_install.sh<enter>",{% endraw %}
+        "<wait>",
+        {% raw %}"curl http://{{ .HTTPIP }}:{{ .HTTPPort }}/arch_chroot.sh -o arch_chroot.sh<enter>",{% endraw %}
+        "<wait>",
+        "bash arch_install.sh",
+        "<enter>"
+      ],
+      {% raw %}"boot_wait": "{{ user `boot_wait` }}",{% endraw %}
+      "disk_interface": "virtio",
+      {% raw %}"disk_size": "{{ user `disk_size` }}",{% endraw %}
+      "format": "qcow2",
+      {% raw %}"headless": "{{ user `headless` }}",{% endraw %}
+      "http_directory": "http",
+      {% raw %}"iso_checksum": "{{ user `iso_checksum_type` }}:{{ user `iso_checksum` }}",{% endraw %}
+      {% raw %}"iso_url": "{{ user `iso_url` }}",{% endraw %}
+      {% raw %}"memory": "{{ user `memory` }}",{% endraw %}
+      "net_device": "virtio-net",
+      "output_directory": "{{ packer_output_directory }}",
+      "qemuargs": [
+        [
+          "-machine",
+          "pc-q35-5.0,accel=kvm"
+        ],
+        [
+          "-device",
+          "pcie-root-port,port=0x10,chassis=1,id=pci.1,bus=pcie.0,multifunction=on,addr=0x2"
+        ],
+        [
+          "-device",
+          "virtio-net-pci,netdev=user.0,id=net0,bus=pci.1,addr=0x0"
+        ]
+      ],
+      {% raw %}"shutdown_command": "echo '{{ user `first_password` }}' | sudo -S /sbin/shutdown -hP now",{% endraw %}
+      {% raw %}"ssh_password": "{{ user `first_password` }}",{% endraw %}
+      "ssh_port": 22,
+      "ssh_timeout": "30m",
+      {% raw %}"ssh_username": "{{ user `first_user` }}",{% endraw %}
+      "type": "qemu",
+      {% raw %}"vm_name": "{{ user `vm_name` }}"{% endraw %}
+    }
+  ],
+  "provisioners": [
+    {
+      "playbook_file": "{{ playbook_dir}}/{{ packer_playbook_file }}",
+      "roles_path": "{{ packer_roles_path }}",
+      "type": "ansible"
+    }
+  ],
+  "variables": {
+    "boot_wait": "40s",
+    "cpus": "2",
+    "disk_size": "20480",
+    "first_password": "password",
+    "first_user": "user",
+    "headless": "true",
+    {% raw %}"http_proxy": "{{env `http_proxy`}}",{% endraw %}
+    {% raw %}"https_proxy": "{{env `https_proxy`}}",{% endraw %}
+    "iso_checksum": "67c2603d194a004f7010f57c25faa5dcea04a05f",
+    "iso_checksum_type": "sha1",
+    "iso_url": "https://appuals.com/archlinux/iso/2020.10.01/archlinux-2020.10.01-x86_64.iso",
+    "memory": "2048",
+    {% raw %}"no_proxy": "{{env `no_proxy`}}",{% endraw %}
+    "template": "archlinux-2020.10.01-x86_64",
+    {% raw %}"vm_name": "{{ user `template`}}.qcow2"{% endraw %}
+  }
+}
+

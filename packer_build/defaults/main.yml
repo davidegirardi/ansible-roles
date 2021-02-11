@@ -1,0 +1,19 @@
+---
+
+# The host to use for building the template
+build_host: localhost
+
+# VM template to build
+template_name: debian-10.6.0-amd64
+  
+# Where to store the output disk files 
+vm_template_repo: '{{ ansible_env.HOME }}/packer_templates'
+
+# Playbook file (in this ansible repo) to use when configuring the VM after generating it
+packer_playbook_file: 'debian_guest.yml'
+
+# Roles directory, similar concept of packer_playbook_file
+packer_roles_path: '{{ playbook_dir }}/roles'
+
+# Packer (one-time) output directory (it's here just to simplify the packer template generation
+packer_output_directory: build

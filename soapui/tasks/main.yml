@@ -1,0 +1,11 @@
+---
+- name: Download SoapUI
+  become: no
+  get_url:
+    url: "{{ soapui_url }}"
+    dest: "{{ ansible_env.HOME }}/soapui.tar.gz"
+- name: Extract SoapUI
+  unarchive:
+    src: "{{ ansible_env.HOME }}/soapui.tar.gz"
+    dest: "{{ ansible_env.HOME }}/"
+    remote_src: yes

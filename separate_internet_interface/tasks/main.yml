@@ -1,0 +1,11 @@
+---
+- name: Configure internet interface
+  become: yes
+  blockinfile:
+    path: '/etc/network/interfaces.d/{{ internet_if }}'
+    create: yes
+    owner: root
+    group: root
+    mode: 0660
+    block: |
+      iface {{ internet_if }} inet dhcp

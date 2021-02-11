@@ -1,0 +1,12 @@
+---
+- name: Set authorized key taken from default RSA identity
+  become: yes
+  authorized_key:
+    user: '{{ ssh_user }}'
+    state: present
+    key: "{{ item }}"
+  # Temporary until I find why fileglob stopped working
+  with_file:
+    - "~/.ssh/id_rsa.pub"
+# with_fileglob:
+#   - "~/.ssh/*.pub"

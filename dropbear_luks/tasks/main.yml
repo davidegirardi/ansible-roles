@@ -1,0 +1,26 @@
+---
+- name: Install dropbear-initramfs
+  become: yes
+  apt:
+    update_cache: yes
+    pkg:
+    - dropbear-initramfs
+
+- name: Configure listening port
+  become: yes
+  lineinfile:
+    path: /etc/dropbear-initramfs/config
+    regexp: '^DROPBEAR_OPTIONS='
+    line: 'DROPBEAR_OPTIONS=-p{{ dropbear_port }}'
+  notify: 'update-initramfs'
+
+
+- name: Set authorized key taken from default RSA identity
+  become: yes
+  authorized_key:
+    user: root
+    path: /etc/dropbear-initramfs/authorized_keys
+    state: present
+    key: "{{ item }}"
+  notify: 'update-initramfs'
+  with_items: '{{ dropbear_keys }}'

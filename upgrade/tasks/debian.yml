@@ -1,0 +1,15 @@
+---
+- name: Update all packages to the latest version
+  become: yes
+  apt:
+    update_cache: yes
+    upgrade: full
+- name: Remove dependencies that are no longer required
+  become: yes
+  apt:
+    autoremove: yes
+- name: Remove useless packages from the cache
+  become: yes
+  apt:
+    autoclean: yes
+

@@ -1,0 +1,8 @@
+---
+- name: Update all packages to the latest version
+  become: yes
+  pacman:
+    update_cache: yes
+    upgrade: yes
+
+

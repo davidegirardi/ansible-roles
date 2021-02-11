@@ -1,0 +1,43 @@
+---
+
+- name: Search for windows updates
+  win_updates:
+    state: searched
+
+- name: Install all possible Windows updates
+  win_updates:
+    category_names:
+      - Application
+      - Connectors
+      - Critical Updates
+      - CriticalUpdates
+      - Definition Updates
+      - DefinitionUpdates
+      - Developer Kits
+      - DeveloperKits
+      - Feature Packs
+      - FeaturePacks
+      - Guidance
+      - Microsoft Defender Antivirus
+      - Security Updates
+      - SecurityUpdates
+      - Service Packs
+      - ServicePacks
+      - Tools
+      - Update Rollups
+      - UpdateRollups
+      - Updates
+      - Windows 10
+      - Windows 10 LTSB
+      - Windows 10, version 1903 and later
+    log_path: c:\ansible_wu.txt
+    reboot: yes
+    reboot_timeout: 1800
+  register: update_result
+
+- name: WU results
+  debug:
+    msg: |
+        {% for k in update_result.updates %}
+        {{ update_result.updates[k].title }}
+        {% endfor %}

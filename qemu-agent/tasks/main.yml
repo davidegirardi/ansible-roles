@@ -1,0 +1,23 @@
+---
+- name: Install qemu-guest-agent
+  vars:
+    packages:
+      present:
+      - qemu-guest-agent
+  include_role:
+    name: install_packages
+
+- name: Force loading virtio_console
+  when: ansible_facts['os_family'] == "Archlinux"
+  lineinfile:
+    path: /etc/mkinitcpio.conf
+    regexp: ^MODULES=\((?!virtio_console)(.*)\)$
+    line: MODULES=(virtio_console \1)
+    backrefs: yes
+  notify: 'arch_mkinitcpio'
+
+- name: Enable qemu-guest-agent
+  when: ansible_facts['os_family'] == "Archlinux"
+  service:
+    name: qemu-guest-agent
+    enabled: yes

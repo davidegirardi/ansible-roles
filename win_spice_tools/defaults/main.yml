@@ -1,0 +1,14 @@
+force_spice_install: no
+vdagent_win_version: 0.10.0
+virtio_win_iso_url: https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/latest-virtio/virtio-win.iso
+windows_version: w10
+drivers:
+  Balloon:
+    file: blnsvr.exe
+    cert_name: balloon.cer
+  qxldod:
+    file: qxldod.cat
+    cert_name: qxldod.cer
+  vioserial:
+    file: vioser.cat
+    cert_name: vioser.cer

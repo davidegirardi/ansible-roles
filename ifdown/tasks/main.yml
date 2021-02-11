@@ -1,0 +1,6 @@
+---
+- name: Take Internet network interface down
+  become: yes
+  shell: 'ifdown {{ internet_if }}'
+  when: true
+

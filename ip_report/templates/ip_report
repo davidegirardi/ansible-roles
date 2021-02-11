@@ -1,0 +1,2 @@
+#!/bin/sh
+curl -s {{ ip_report_url | quote }}

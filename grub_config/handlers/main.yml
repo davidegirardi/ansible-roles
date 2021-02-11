@@ -1,0 +1,7 @@
+---
+- name: Update GRUB configuration
+  become: yes
+  shell: |
+    update-grub
+  listen: 'update-grub'
+

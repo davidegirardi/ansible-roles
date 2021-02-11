@@ -1,0 +1,42 @@
+---
+
+- name: Set Debian-based KVM packages
+  set_fact:
+    packages:
+      present:
+      - gir1.2-spiceclientgtk-3.0
+      - dnsmasq
+      - libvirt-clients
+      - libvirt-daemon-system
+      - qemu-kvm
+      - qemu-utils
+      - spice-client-gtk
+  when: ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "Ubuntu"
+
+- name: Set Arch-based KVM packages
+  set_fact:
+    packages:
+      present:
+        - bridge-utils
+        - dnsmasq
+        - ebtables
+        - iptables
+        - libvirt
+        - qemu
+        - virt-manager
+        - virt-viewer
+  when: ansible_facts['os_family'] == "Archlinux"
+
+- name: Install packages
+  include_role:
+    name: install_packages
+
+- name: Add networks to libvirtd
+  include_tasks:
+    file: '{{ role_path }}/tasks/add_network.yml'
+  loop: '{{ kvm_networks | dict2items }}'
+
+- name: Configure Samba for the virtual networks
+  include_tasks:
+    file: '{{ role_path }}/tasks/config_smb.yml'
+  loop: '{{ kvm_networks | dict2items }}'

@@ -1,0 +1,9 @@
+---
+
+- name: Enable services
+  become: yes
+  service:
+    name: '{{ item.key }}'
+    state: '{{ item.value }}'
+    enabled: '{{ item.value == "started" | ternary("yes", "no") }}'
+  loop: '{{ services | dict2items }}'

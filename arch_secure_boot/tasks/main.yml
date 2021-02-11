@@ -1,0 +1,197 @@
+---
+
+- name: Install required packages
+  vars:
+    packages:
+      present:
+      - efitools
+      - binutils
+  include_role:
+    name: install_packages
+
+- name: Create /etc/secureboot
+  become: yes
+  file:
+    path: /etc/secureboot
+    state: directory
+    owner: root
+    group: root
+    mode: 0700
+  register: etcsecureboot
+
+- name: Dump current secureboot keys
+  become: yes
+  shell:
+    creates: '{{ etcsecureboot.path }}/old_dbx.esl'
+    chdir: '{{ etcsecureboot.path }}'
+    cmd: |
+      # Dump of the running secure boot keys
+      efi-readvar -v PK
+      efi-readvar -v PK -o old_PK.esl
+      efi-readvar -v KEK -o old_KEK.esl
+      efi-readvar -v db -o old_db.esl
+      efi-readvar -v dbx -o old_dbx.esl
+
+- name: Create local secureboot PKI
+  become: yes
+  shell:
+    chdir: '{{ etcsecureboot.path }}'
+    creates: '{{ etcsecureboot.path }}/PK.key'
+    cmd: |
+      openssl req -new -x509 -newkey rsa:2048 -subj "/CN={{ ansible_fqdn }} PK/" -keyout PK.key -out PK.crt -days 3650 -nodes -sha256
+      openssl req -new -x509 -newkey rsa:2048 -subj "/CN={{ ansible_fqdn }} KEK/" -keyout KEK.key -out KEK.crt -days 3650 -nodes -sha256
+      openssl req -new -x509 -newkey rsa:2048 -subj "/CN={{ ansible_fqdn }} db/" -keyout db.key -out db.crt -days 3650 -nodes -sha256
+      chmod 0600 *.key
+
+- name: Create custom PK
+  become: yes
+  shell:
+    creates: '{{ etcsecureboot.path }}/PK.esl'
+    chdir: '{{ etcsecureboot.path }}'
+    cmd: cert-to-efi-sig-list -g "$(uuidgen)" PK.crt PK.esl
+
+- name: Self-sing custom Platform Key
+  become: yes
+  shell:
+    chdir: '{{ etcsecureboot.path }}'
+    creates: '{{ etcsecureboot.path }}/PK.auth'
+    cmd: |
+      # Use this if you don't want to trust default keys
+      sign-efi-sig-list -k PK.key -c PK.crt PK PK.esl PK.auth
+
+- name: Create Efi Signature List for KEK, db, and dbx
+  become: yes
+  shell:
+    chdir: '{{ etcsecureboot.path }}'
+    creates: '{{ etcsecureboot.path }}/db.auth'
+    cmd: |
+      cert-to-efi-sig-list -g "$(uuidgen)" KEK.crt KEK.esl
+      sign-efi-sig-list -a -k PK.key -c PK.crt KEK KEK.esl KEK.auth
+      cert-to-efi-sig-list -g "$(uuidgen)" db.crt db.esl
+      sign-efi-sig-list -a -k KEK.key -c KEK.crt db db.esl db.auth
+      # We just reuse the content of the blacklisted keys
+      sign-efi-sig-list -k KEK.key -c KEK.crt dbx old_dbx.esl old_dbx.auth
+
+- name: Prepare certs for installation
+  become: yes
+  shell:
+    chdir: '{{ etcsecureboot.path }}'
+    creates: '{{ etcsecureboot.path }}/PK.cer'
+    cmd: |
+      openssl x509 -in PK.crt -out PK.cer -outform DER
+      openssl x509 -in KEK.crt -out KEK.cer -outform DER
+      openssl x509 -in db.crt -out db.cer -outform DER
+
+- name: Prepare compound KEK and db
+  become: yes
+  shell:
+    chdir: '{{ etcsecureboot.path }}'
+    creates: '{{ etcsecureboot.path }}/compound_db.auth'
+    cmd: |
+      # Finally, we'll create compound (i.e., old+new) esl files for the KEK and db (esl files can simply be concatenated[6]), and also create .auth counterparts for these. Issue:
+      cat old_KEK.esl KEK.esl > compound_KEK.esl
+      cat old_db.esl db.esl > compound_db.esl
+      sign-efi-sig-list -k PK.key -c PK.crt KEK compound_KEK.esl compound_KEK.auth
+      sign-efi-sig-list -k KEK.key -c KEK.crt db compound_db.esl compound_db.auth
+  when: trust_pre_existing_secureboot_config
+
+- name: Copy kernel command line
+  become: yes
+  copy:
+    src: /proc/cmdline
+    dest: '{{ etcsecureboot.path }}/kernel-cmdline-linux.conf'
+    mode: 0600
+    force: no
+
+- name: Sign EFI objects
+  become: yes
+  shell:
+    creates: /boot/EFI/systemd/systemd-bootx64.efi.orig
+    cmd: |
+      find /boot/EFI -type f -iname '*.efi' -exec cp "{{ '{}' }}" "{{ '{}'}}.orig" \;
+      find /boot/EFI -type f -iname '*.efi' -exec sbsign --key {{ etcsecureboot.path }}/db.key --cert {{ etcsecureboot.path }}/db.crt --output "{{ '{}' }}" "{{ '{}'}}.orig" \;
+
+- name: Create boot entry
+  become: yes
+  copy:
+    src: files/boot/loader/entries/arch-signed.conf
+    dest: /boot/loader/entries/arch-signed.conf
+    mode: 0755
+
+- name: Configure default entry
+  become: yes
+  lineinfile:
+    path: /boot/loader/loader.conf
+    regex: 'default\ '
+    line: default arch-signed.conf
+
+- name: Create hook script
+  become: yes
+  copy:
+    src: files/usr/local/sbin/kernel-signing-hook.sh
+    dest: /usr/local/sbin/kernel-signing-hook.sh
+    owner: root
+    group: root
+    mode: 0700
+
+- name: Create pacman hook directory
+  become: yes
+  file:
+    path: /etc/pacman.d/hooks
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+
+- name: Create pacman hook
+  become: yes
+  copy:
+    src: files/etc/pacman.d/hooks/linux-secure-boot.hook
+    dest: /etc/pacman.d/hooks/linux-secure-boot.hook
+    mode: 0644
+
+- name: Sign linux kernel
+  become: yes
+  shell:
+    creates: /boot/linux-signed.img
+    cmd: |
+      /usr/local/sbin/kernel-signing-hook.sh /boot/vmlinuz-linux
+
+- name: Create post-reboot setup script including previous config
+  become: yes
+  blockinfile:
+    create: yes
+    path: '{{ etcsecureboot.path }}/runme_once.sh'
+    mode: '0744'
+    block: |
+      cd '{{ etcsecureboot.path }}'
+      efi-readvar
+      efi-updatevar -e -f old_dbx.esl dbx
+      efi-updatevar -e -f compound_db.esl db
+      efi-updatevar -e -f compound_KEK.esl KEK
+      efi-updatevar -f PK.auth PK
+  register: newsecurebootscript
+  when: trust_pre_existing_secureboot_config
+
+- name: Create post-reboot setup script
+  become: yes
+  blockinfile:
+    create: yes
+    path: '{{ etcsecureboot.path }}/runme_once.sh'
+    mode: '0744'
+    block: |
+      cd '{{ etcsecureboot.path }}'
+      efi-readvar
+      efi-updatevar -e -f old_dbx.esl dbx
+      efi-updatevar -e -f db.esl db
+      efi-updatevar -e -f KEK.esl KEK
+      efi-updatevar -f PK.auth PK
+  register: newsecurebootscript
+  when: not trust_pre_existing_secureboot_config
+
+- name: Post-reboot steps. READ THIS!
+  debug:
+    msg:
+      - "Reboot the computer, set it in 'setup mode' and run: {{ etcsecureboot.path }}/runme_once.sh"
+  when: newsecurebootscript.changed
+

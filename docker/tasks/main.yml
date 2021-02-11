@@ -1,0 +1,40 @@
+---
+
+- name: Upgrade
+  include_role:
+    name: upgrade
+
+- name: Install dependencies
+  become: yes
+  apt:
+    update_cache: yes
+    name: "{{ packagesdep }}"
+    state: present
+  vars:
+    packagesdep:
+    - git
+    - apt-transport-https
+    - ca-certificates
+    - wget
+    - software-properties-common
+    - gnupg2
+    - curl
+
+- name: Add Docker APT key
+  become: yes
+  apt_key:
+    url: https://download.docker.com/linux/debian/gpg
+    state: present
+
+- name: add docker official repository for Debian Stretch
+  become: yes
+  apt_repository:
+    repo: deb [arch=amd64] https://download.docker.com/linux/debian stretch stable
+    state: present
+
+- name: actually install docker
+  become: yes
+  apt:
+    name: "docker-ce"
+    state: present
+    update_cache: yes

@@ -1,0 +1,26 @@
+---
+
+- name: Install keys
+  become: yes
+  apt_key:
+    url: '{{ item.1 }}'
+    state: present
+  loop: "{{ unofficial_repositories | dict2items | subelements('value.keys') }}"
+
+- name: Install repository
+  become: yes
+  apt_repository:
+    repo: '{{ item.value.repo }}'
+    state: present
+  loop: "{{ unofficial_repositories | dict2items }}"
+
+- name: Install package
+  include_role:
+    name: install_packages
+  vars:
+    packages:
+      present:
+      - '{{ unofficial.1 }}'
+  loop: "{{ unofficial_repositories | dict2items | subelements('value.packages') }}"
+  loop_control:
+    loop_var: unofficial

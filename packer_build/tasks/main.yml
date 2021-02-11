@@ -1,0 +1,55 @@
+---
+
+- name: Template repository
+  file:
+    path: '{{ vm_template_repo }}'
+    state: directory
+    mode: 0700
+  register: repo
+
+- name: Check for pre-built image
+  stat:
+    path: '{{ repo.path }}/{{ template_name }}.qcow2'
+    get_checksum: no
+  register: pre_built_vm
+
+- name: Create packer build environment
+  block:
+    - name: Create temporary work directory
+      tempfile:
+        state: directory
+      register: tmp_workdir
+    - name: http directory
+      copy:
+        src: files/http
+        dest: '{{ tmp_workdir.path }}'
+        directory_mode: 0700
+    - name: Packer template
+      template:
+        src: 'templates/{{ template_name }}.json'
+        dest: '{{ tmp_workdir.path }}'
+        mode: 0600
+  when: pre_built_vm.stat.exists is false
+
+- name: Build VM
+  block:
+    - name: Log info
+      debug:
+        msg:
+          - "To see the packer output, run:"
+          - "tail -f {{ tmp_workdir.path }}/packer_build.log"
+    - name: Run packer build
+      shell: |
+        cd '{{ tmp_workdir.path }}'
+        packer build '{{ template_name }}.json' | tee packer_build.log
+    - name: Move the vm to the repository
+      command:
+        mv {{ tmp_workdir.path }}/{{ packer_output_directory }}/{{ template_name }}.qcow2 {{ vm_template_repo }}/
+  when: pre_built_vm.stat.exists is false
+
+- name: Cleanup
+  file:
+    path: '{{ tmp_workdir.path }}'
+    state: absent
+  register: wtf
+  when: pre_built_vm.stat.exists is false

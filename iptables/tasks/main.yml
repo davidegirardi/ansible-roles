@@ -1,0 +1,9 @@
+---
+
+- include: iptables.yml
+  vars:
+    ipversion: 4
+
+- include: iptables.yml
+  vars:
+    ipversion: 6

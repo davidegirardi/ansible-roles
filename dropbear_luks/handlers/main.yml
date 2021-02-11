@@ -1,0 +1,6 @@
+---
+- name: Rebuild intiramfs
+  become: yes
+  shell: |
+    update-initramfs -k all -u
+  listen: 'update-initramfs'

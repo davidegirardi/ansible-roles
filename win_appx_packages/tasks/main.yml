@@ -1,0 +1,9 @@
+---
+- name: Remove Appx packages
+  win_shell: |
+    $package = Get-AppxPackage "*{{ item }}*" 
+    $package
+    if ($package) { $package | Remove-AppxPackage }
+  with_items: '{{ appx_packages.remove }}'
+  register: winappx
+  changed_when: "winappx.stdout != ''"

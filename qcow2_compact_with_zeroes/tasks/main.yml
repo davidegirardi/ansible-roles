@@ -1,0 +1,5 @@
+---
+- name: Write zerofile and deleteit
+  shell: |
+    dd if=/dev/zero of=/data-z7KWgAClOzsExsbRT0DGlUUPnSfaLbNX bs=100M
+    rm /data-z7KWgAClOzsExsbRT0DGlUUPnSfaLbNX

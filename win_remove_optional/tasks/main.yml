@@ -1,0 +1,11 @@
+---
+- name: Remove optional windows features
+  win_shell: |
+    $feature = Get-WindowsOptionalFeature -Online -FeatureName "{{ item }}"
+    if ($feature.State -match "Enabled") {
+      "Disabling feature via ansible"
+      Disable-WindowsOptionalFeature -Online -FeatureName "{{ item }}" -Remove -NoRestart
+    }
+  with_items: '{{ remove_features }}'
+  register: feature_change
+  changed_when: '"Disabling feature via ansible" in feature_change.stdout'

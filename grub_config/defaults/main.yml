@@ -1,0 +1,4 @@
+---
+vars:
+  # 1 second timeout at boot
+  grub_timeout: 1

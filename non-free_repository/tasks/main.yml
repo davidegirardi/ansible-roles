@@ -1,0 +1,16 @@
+---
+
+- name: Enable non-free repositories
+  become: yes
+  apt_repository:
+    repo: deb http://deb.debian.org/debian buster main contrib non-free
+
+- name: Enable non-free security repositories
+  become: yes
+  apt_repository:
+    repo: deb http://deb.debian.org/debian-security/ buster/updates main contrib non-free
+
+- name: Enable non-free updates repositories
+  become: yes
+  apt_repository:
+    repo: deb http://deb.debian.org/debian buster-updates main contrib non-free

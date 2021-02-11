@@ -1,0 +1,14 @@
+---
+
+- name: Configure lightdm
+  become: yes
+  blockinfile:
+    path: /etc/lightdm/lightdm-gtk-greeter.conf
+    block: |
+      [greeter]
+      theme-name = Adwaita-dark
+      icon-theme-name = Arc
+      font-name = Droid Sans 10
+      user-background = false
+      hide-user-image = true
+

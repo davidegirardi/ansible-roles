@@ -1,0 +1,4 @@
+---
+- name: Windows Ping module
+  ping:
+    data: test

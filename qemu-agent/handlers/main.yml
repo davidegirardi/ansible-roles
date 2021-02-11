@@ -1,0 +1,5 @@
+---
+- name: Rebuild initcpio
+  when: ansible_facts['os_family'] == "Archlinux"
+  shell: mkinitcpio -p linux
+  listen: 'arch_mkinitcpio'

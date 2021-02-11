@@ -1,0 +1,14 @@
+---
+- name: TearFree for AMD GPU
+  become: yes
+  copy:
+    dest: /etc/X11/xorg.conf.d/amdgpu.conf
+    content: |
+      Section "Device"
+          Identifier "amdgpu"
+          Option "TearFree" "true"
+          Driver "amdgpu"
+      EndSection
+    owner: root
+    group: root
+    mode: 0644

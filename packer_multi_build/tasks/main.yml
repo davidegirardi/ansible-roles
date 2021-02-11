@@ -1,0 +1,9 @@
+---
+
+- name: Build images
+  vars:
+    template_name: '{{ item.key }}'
+    packer_playbook_file: '{{ item.value.playbook }}'
+  include_role:
+    name: packer_build
+  loop: "{{ images | dict2items }}"

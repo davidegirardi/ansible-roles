@@ -1,0 +1,12 @@
+---
+- name: Enable non-free repositories
+  become: yes
+  apt_repository:
+    repo: deb http://deb.debian.org/debian/ bullseye main non-free
+
+- name: Install wifi drivers
+  become: yes
+  apt:
+    update_cache: yes
+    pkg:
+      - firmware-iwlwifi

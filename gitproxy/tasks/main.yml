@@ -1,0 +1,14 @@
+---
+- name: 'Add {{ gitproxy_user }} account'
+  include_role:
+    name: add_users
+  vars:
+    accounts: '{{ gitproxy_user }}'
+
+- name: Create repo creation script
+  become: yes
+  template:
+    src: templates/mkrepo.sh
+    dest: '/home/{{ gitproxy_user }}/'
+    owner: root
+    mode: 0755

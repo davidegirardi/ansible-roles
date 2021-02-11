@@ -1,0 +1,78 @@
+---
+- name: Check QEMU-GA services
+  win_service:
+    name: QEMU-GA
+  register: qemu_guest_agent
+
+- name: Install SPICE guest tools
+  block:
+
+  - name: Install 7zip
+    win_package:
+      path: https://www.7-zip.org/a/7z1900-x64.msi
+      product_id: '{23170F69-40C1-2702-1900-000001000000}'
+    register: sevenzip_install
+
+  - name: Download spice tools
+    win_get_url:
+      url: https://www.spice-space.org/download/windows/spice-guest-tools/spice-guest-tools-latest.exe
+      dest: '{{ ansible_env.TEMP }}\spice-guest-tools-latest.exe'
+      # Make sense to force the redownload too when forcing the SPICE tools installation
+      force: '{{ force_spice_install }}'
+    register: spice_tools
+
+  - name: Create temporary path
+    win_tempfile:
+      state: directory
+    register: wd
+
+  - name: Extract SPICE tools installation files
+    win_shell: |
+      cd {{ wd.path }};
+      & 'C:\Program Files\7-Zip\7z.exe' x {{ spice_tools.dest }}
+
+  - name: Extract RedHat certificates
+    win_shell: |
+      $cert = (Get-AuthenticodeSignature "{{ wd.path }}\drivers\{{ item.key }}\{{ windows_version }}\amd64\{{ item.value.file }}").SignerCertificate
+      [System.IO.File]::WriteAllBytes(
+        "{{ ansible_env.TEMP }}\{{ item.value.cert_name }}",
+        $cert.Export([System.Security.Cryptography.X509Certificates.X509ContentType]::Cert
+        )
+      )
+    with_dict: '{{ drivers }}'
+
+  - name: Install RedHat certificates
+    win_command: 'certutil.exe -f -addstore "TrustedPublisher" {{ ansible_env.TEMP }}\{{ item.value.cert_name }}'
+    with_dict: '{{ drivers }}'
+
+  - name: Install SPICE tools
+    win_command: '{{ spice_tools.dest }} /S'
+
+  - name: Install QEMU Guest Agent
+    win_package:
+      path: https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/archive-qemu-ga/qemu-ga-win-101.2.0-1.el7ev/qemu-ga-x86_64.msi
+      product_id: '{BBB1A253-8C7C-49C0-8378-AF8CBED116C3}'
+
+  - name: Remove 7zip
+    win_package:
+      product_id: '{23170F69-40C1-2702-1900-000001000000}'
+      state: absent
+    when: sevenzip_install.changed == true
+
+  - name: Cleanup
+    block:
+      - name: Delete certificates
+        win_file:
+          path: '{{ ansible_env.TEMP }}\{{ item.value.cert_name }}'
+          state: absent
+        with_dict: '{{ drivers }}'
+      - name: Delete installer
+        win_file:
+          path: '{{ spice_tools.dest }}'
+          state: absent
+      - name: Delete extracted SPICE tools
+        win_file:
+          path: '{{ wd.path }}'
+          state: absent
+
+  when: qemu_guest_agent.state is not defined or force_spice_install is true

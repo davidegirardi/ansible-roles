@@ -1,0 +1,43 @@
+---
+- name: Install requirements
+  vars:
+    packages:
+      present:
+        - tmux
+        - git
+        - python3-virtualenv
+        - python3-pip
+        - python3-tabulate
+        - python3-setuptools
+        - python3-docker
+  include_role:
+    name: install_packages
+
+- name: Neo4J
+  include_role:
+    name: neo4j
+
+- name: Get PlumHound
+  become: no
+  git:
+    repo: https://github.com/PlumHound/PlumHound.git
+    dest: PlumHound
+    force: yes
+  register: plumhound_git
+
+- name: pip install requirements
+  become: no
+  pip:
+    chdir: '{{ ansible_env.HOME }}/PlumHound'
+    requirements: requirements.txt
+
+- name: Create PlumHound script
+  vars:
+    neo4j_password: "{{ lookup('password', 'credentials/neo4j_password chars=ascii_letters,digits length=32') }}"
+  blockinfile:
+    path: '{{ ansible_env.HOME }}/run_plumhound.sh'
+    mode: 0700
+    create: yes
+    block: |
+      cd ~/PlumHound
+      python3 PlumHound.py -s "bolt://0.0.0.0:7687" -u "neo4j" -p "{{ neo4j_password }}" --ox stdout -v1000 $*

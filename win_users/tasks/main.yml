@@ -1,0 +1,26 @@
+---
+
+- name: Configure user accounts
+  win_user:
+    name: '{{ item.key }}'
+    state: '{{ item.value.state | default("present") }}'
+    account_disabled: '{{ item.value.disabled | default("no") }}'
+    groups: '{{ item.value.groups }}'
+    password: "{{ lookup('password', 'credentials/{{ item.key }}_initial_password chars=ascii_letters,digits length=32') }}"
+    update_password: '{{ item.value.update_password | default("on_create") }}'
+  with_dict: '{{ accounts }}'
+
+- name: Add profiles
+  win_user_profile:
+    username: '{{ item.key }}'
+    name: '{{ item.key }}'
+    state: present
+  with_dict: '{{ accounts }}'
+  when: item.value.state | default('present') == 'present'
+
+- name: Delete profiles
+  win_user_profile:
+    name: '{{ item.key }}'
+    state: absent
+  with_dict: '{{ accounts }}'
+  when: item.value.state | default('present') == 'absent'

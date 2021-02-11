@@ -1,0 +1,27 @@
+---
+
+- name: First Spotify APT key
+  become: yes
+  apt_key:
+    url: https://download.spotify.com/debian/pubkey.gpg
+    state: present
+
+- name: Second Spotify APT key
+  become: yes
+  apt_key:
+    url: https://download.spotify.com/debian/pubkey_0D811D58.gpg
+    state: present
+
+- name: Spotify repository
+  become: yes
+  apt_repository:
+    repo: deb http://repository.spotify.com stable non-free
+    state: present
+
+- name: Install Spotify
+  include_role:
+    name: install_packages
+  vars:
+    - packages:
+        present:
+        - spotify-client

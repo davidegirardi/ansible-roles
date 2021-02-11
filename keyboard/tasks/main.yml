@@ -1,0 +1,19 @@
+---
+
+- name: Check X11 keyboard settings
+  shell: localectl status
+  register: localestatus
+  changed_when: false
+
+- name: Set X11 keyboard settings
+  become: yes
+  shell: localectl set-x11-keymap us pc104 altgr-intl caps:escape_shifted_capslock
+  when: "localestatus.stdout_lines is defined and (
+        localestatus.stdout_lines[0].find('System Locale: LANG=en_US.UTF-8') == -1 or
+        localestatus.stdout_lines[1].find('VC Keymap: us') == -1 or
+        localestatus.stdout_lines[2].find('X11 Layout: us') == -1 or
+        localestatus.stdout_lines[3].find('X11 Model: pc104') == -1 or
+        localestatus.stdout_lines[4].find('X11 Variant: altgr-intl') == -1 or
+        localestatus.stdout_lines[5].find('X11 Options: caps:escape_shifted_capslock') == -1
+          )
+        "

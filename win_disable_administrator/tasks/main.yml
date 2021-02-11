@@ -1,0 +1,5 @@
+---
+- name: Disable built-in Administrator
+  win_user:
+    name: Administrator
+    account_disabled: yes

@@ -1,0 +1,5 @@
+---
+- name: Take Internet network interface up
+  become: yes
+  shell: 'ifup {{ internet_if }}'
+  when: ansible_default_ipv4.gateway is not defined

@@ -1,0 +1,9 @@
+---
+
+- name: Allow realtime priority for members of audio
+  become: yes
+  pam_limits:
+    domain: '@audio'
+    limit_type: '-'
+    limit_item: rtprio
+    value: '99'

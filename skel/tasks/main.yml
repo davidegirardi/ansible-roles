@@ -1,0 +1,9 @@
+---
+- name: Copy default home directory files
+  become: yes
+  copy:
+    src: files/skel/
+    dest: /etc/skel/
+    owner: root
+    group: root
+    mode: go=-rwx

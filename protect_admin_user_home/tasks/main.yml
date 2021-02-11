@@ -1,0 +1,7 @@
+---
+
+- name: 'Protect home directory of remote_user'
+  become: yes
+  file:
+    path: '{{ ansible_env.HOME }}'
+    mode: u=rwX,g,o=

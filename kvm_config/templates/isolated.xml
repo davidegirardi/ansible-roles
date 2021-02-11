@@ -1,0 +1,11 @@
+<network>
+    <name>{{ item.key }}</name>
+    <bridge name='{{ item.value.bridge }}' stp='on' delay='0'/>
+    <domain name='{{ item.value.dns_domain }}' localOnly='yes'/>
+    <ip address='{{ item.value.gw_ip }}' netmask='{{ item.value.netmask }}'>
+        <dhcp>
+            <range start='{{ item.value.dhcp_from }}' end='{{ item.value.dhcp_to }}'/>
+        </dhcp>
+    </ip>
+</network>
+
