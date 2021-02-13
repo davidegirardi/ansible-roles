@@ -1,0 +1,26 @@
+---
+
+- name: Configure /etc/modprobe.d/
+  become: yes
+  lineinfile:
+    path: '/etc/modprobe.d/{{ item.key }}.conf'
+    regex: '^{{ item.key }}'
+    line: '{{ item.key }} {{ item.value.params }}'
+    create: yes
+  loop: '{{ modules | dict2items }}'
+
+- name: Autoload module at boot
+  become: yes
+  lineinfile:
+    path: '/etc/modules-load.d/{{ item.key }}.conf'
+    regex: '^{{ item.key }}'
+    line: '{{ item.key }}'
+    create: yes
+  loop: '{{ modules | dict2items }}'
+
+- name: Load module
+  become: yes
+  modprobe:
+    name: '{{ item.key }}'
+    params: '{{ item.value.params }}'
+  loop: '{{ modules | dict2items }}'
