@@ -1,0 +1,25 @@
+---
+
+- name: Check pre-existing BankID
+  win_stat:
+    path: C:\Program Files (x86)\BankID\BankID.exe
+  register: bankid_installed
+
+- name: Install BankID
+  block:
+
+  - name: Download BankID
+    win_get_url:
+      url: https://install.bankid.com/FileDownloader?fileId=Win
+      dest: '{{ ansible_env.TEMP }}\bankid_installer.exe'
+    register: installer
+
+  - name: Install BankID
+    win_command: '{{ installer.dest }} /S /v /qn'
+
+  - name: Cleanup
+    win_file:
+      path: '{{ installer.dest }}'
+      state: absent
+
+  when: not bankid_installed.stat.exists
