@@ -29,7 +29,7 @@
 - name: add docker official repository for Debian Stretch
   become: yes
   apt_repository:
-    repo: deb [arch=amd64] https://download.docker.com/linux/debian stretch stable
+    repo: deb [arch=amd64] https://download.docker.com/linux/{{ ansible_distribution }} {{ ansible_distribution_release|lower }} stable
     state: present
 
 - name: actually install docker
