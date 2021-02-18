@@ -5,7 +5,7 @@
   lineinfile:
     path: '/etc/modprobe.d/{{ item.key }}.conf'
     regex: '^{{ item.key }}'
-    line: '{{ item.key }} {{ item.value.params }}'
+    line: 'options {{ item.key }} {{ item.value.params }}'
     create: yes
   loop: '{{ modules | dict2items }}'
 
