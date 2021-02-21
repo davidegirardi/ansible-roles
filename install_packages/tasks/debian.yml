@@ -7,6 +7,7 @@
     update_cache: yes
     name: '{{ item.value }}'
     state: '{{ item.key }}'
+    purge: yes
     install_recommends: no
     autoremove: yes
   with_dict: '{{ packages }}'
