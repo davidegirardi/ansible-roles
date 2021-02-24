@@ -1,13 +1,5 @@
 ---
 
-- name: INPUT policy to DROP
-  become: yes
-  iptables:
-    ip_version: 'ipv{{ ipversion | default("4") }}'
-    chain: INPUT
-    policy: DROP
-  notify: 'save_ip{{ ipversion | default("4") }}tables'
-
 - name: Accept loopback traffic
   become: yes
   iptables:
@@ -39,4 +31,12 @@
     protocol: '{{ item.value.protocol }}'
     jump: '{{ item.value.jump }}'
   loop: '{{ custom_iptables_ports | dict2items }}'
+  notify: 'save_ip{{ ipversion | default("4") }}tables'
+
+- name: INPUT policy to DROP
+  become: yes
+  iptables:
+    ip_version: 'ipv{{ ipversion | default("4") }}'
+    chain: INPUT
+    policy: DROP
   notify: 'save_ip{{ ipversion | default("4") }}tables'
