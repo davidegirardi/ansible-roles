@@ -3,6 +3,7 @@
 - name: Debian install packages
   become: yes
   apt:
+    # Do not autostart services for installed packages
     policy_rc_d: 101
     update_cache: yes
     name: '{{ item.value }}'
