@@ -3,14 +3,14 @@
 - name: Enable non-free repositories
   become: yes
   apt_repository:
-    repo: deb http://deb.debian.org/debian {{ ansible_distribution_release }} main contrib non-free
+    repo: deb http://deb.debian.org/debian {{ ansible_distribution_release }} contrib non-free
 
 - name: Enable non-free security repositories
   become: yes
   apt_repository:
-    repo: deb http://deb.debian.org/debian-security/ {{ ansible_distribution_release }}/updates main contrib non-free
+    repo: deb http://deb.debian.org/debian-security/ {{ ansible_distribution_release }}/updates contrib non-free
 
 - name: Enable non-free updates repositories
   become: yes
   apt_repository:
-    repo: deb http://deb.debian.org/debian {{ ansible_distribution_release }}-updates main contrib non-free
+    repo: deb http://deb.debian.org/debian {{ ansible_distribution_release }}-updates contrib non-free
