@@ -13,7 +13,7 @@
   shell: |
     rm /etc/ssh/ssh_host_*key*
     dpkg-reconfigure openssh-server
-  when: oldhostname != newhostname and ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "Ubuntu"
+  when: regenerate_ssh_keys and oldhostname != newhostname and ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "Ubuntu"
 
 - name: Restart sshd
   service:
