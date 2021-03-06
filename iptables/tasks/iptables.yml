@@ -6,7 +6,7 @@
     ip_version: 'ipv{{ ipversion | default("4") }}'
     chain: INPUT
     action: insert
-    rule_num: 1
+    rule_num: '1'
     in_interface: lo
     jump: ACCEPT
   notify: 'save_ip{{ ipversion | default("4") }}tables'
@@ -31,6 +31,17 @@
     protocol: '{{ item.value.protocol }}'
     jump: '{{ item.value.jump }}'
   loop: '{{ custom_iptables_ports | dict2items }}'
+  notify: 'save_ip{{ ipversion | default("4") }}tables'
+
+- name: Permit ping
+  become: yes
+  iptables:
+    ip_version: 'ipv{{ ipversion | default("4") }}'
+    chain: INPUT
+    protocol: "{{ 'icmpv6' if ipversion == 6 else 'icmp' | default('icmp')}}"
+    icmp_type: echo-request
+    jump: ACCEPT
+  when: iptables_allow_ping
   notify: 'save_ip{{ ipversion | default("4") }}tables'
 
 - name: INPUT policy to DROP
