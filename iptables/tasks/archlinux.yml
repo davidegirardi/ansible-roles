@@ -1,0 +1,21 @@
+---
+
+- set_fact:
+    iptables_save_path: /etc/iptables/iptables.rules
+
+- set_fact:
+    ip6tables_save_path: /etc/iptables/ip6tables.rules
+
+- name: Enable and start iptables
+  become: yes
+  service:
+    name: iptables
+    enabled: yes
+    state: started
+
+- name: Enable and start ip6tables
+  become: yes
+  service:
+    name: ip6tables
+    enabled: yes
+    state: started

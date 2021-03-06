@@ -1,0 +1,22 @@
+---
+
+- name: Install iptables-persistent
+  vars:
+    packages:
+      present:
+      - iptables-persistent
+  include_role:
+    name: install_packages
+
+- set_fact:
+    iptables_save_path: /etc/iptables/rules.v4
+
+- set_fact:
+    ip6tables_save_path: /etc/iptables/rules.v6
+
+- name: Enable and start netfilter-persistent.service
+  become: yes
+  service:
+    name: netfilter-persistent.service
+    enabled: yes
+    state: started

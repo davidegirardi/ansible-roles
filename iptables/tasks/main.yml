@@ -1,5 +1,7 @@
 ---
 
+- include: init.yml
+
 - include: iptables.yml
   vars:
     ipversion: 4

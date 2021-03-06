@@ -5,7 +5,7 @@
   community.general.iptables_state:
     ip_version: ipv4
     state: saved
-    path: /etc/iptables/iptables.rules
+    path: "{{ iptables_save_path }}"
   listen: 'save_ip4tables'
 
 - name: Save ip6tables state
@@ -13,17 +13,6 @@
   community.general.iptables_state:
     ip_version: ipv6
     state: saved
-    path: /etc/iptables/ip6tables.rules
+    path: "{{ ip6tables_save_path }}"
   listen: 'save_ip6tables'
 
-- name: Enable and start iptables
-  service:
-    name: iptables
-    enabled: yes
-    state: started
-
-- name: Enable and start ip6tables
-  service:
-    name: ip6tables
-    enabled: yes
-    state: started
