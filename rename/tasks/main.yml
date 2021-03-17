@@ -4,9 +4,12 @@
   become: no
   shell: |
     hostnamectl | awk '/hostname:/ {print $NF}'
-  register: oldhostname
+  register: hostnamectl_oldhostname
   # Not needed, just to make ansible-lint happy :)
-  when: oldhostname is not defined
+  changed_when: false
+
+- set_fact:
+    oldhostname: '{{ hostnamectl_oldhostname.stdout }}'
 
 - name: Regenerate sshd keys
   become: yes
@@ -19,23 +22,18 @@
   service:
     name: sshd
     state: restarted
+  when: regenerate_ssh_keys and oldhostname != newhostname and ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "Ubuntu"
 
 - name: 'Change to {{ newhostname }}'
   become: yes
   shell: |
     hostnamectl set-hostname {{ newhostname }}
   when: oldhostname != newhostname
+  notify: 'reboot_needed'
 
 - name: Update /etc/hosts
+  become: yes
   lineinfile:
     path: /etc/hosts
+    regex: '^127\.0\.0\.1'
     line: '127.0.0.1    {{ newhostname }}'
-
-- name: Reboot
-  become: yes
-  reboot:
-    reboot_timeout: 2
-  async: 1
-  poll: 0
-  failed_when: true == false
-  when: oldhostname != newhostname
