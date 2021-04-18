@@ -22,7 +22,7 @@
     name: '{{ item.key }}'
     state: present
     xml: '{{ lookup("template", "templates/net.xml") }}'
-  when: (item.value.isolated | default(false)) == false
+  when: (item.value.isolated | default(false)) == true
 
 - name: Autostart virtual network
   become: yes
