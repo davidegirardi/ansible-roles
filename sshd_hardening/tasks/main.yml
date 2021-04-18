@@ -24,6 +24,13 @@
   include_role:
     name: install_packages
 
+- name: Enable sshguard
+  vars:
+    services:
+      sshguard: started
+  include_role:
+    name: services
+
     #- name: Get existing iptables rules
     #  become: true
     #  command: iptables -n -L
