@@ -17,7 +17,6 @@
   notify: 'arch_mkinitcpio'
 
 - name: Enable qemu-guest-agent
-  when: ansible_facts['os_family'] == "Archlinux"
   service:
     name: qemu-guest-agent
     enabled: yes
