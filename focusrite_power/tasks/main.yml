@@ -1,0 +1,13 @@
+---
+
+- name: Disable Focusrite power management via udev
+  become: yes
+  blockinfile:
+    path: /etc/udev/rules.d/60-focusrite-power-control.rules
+    create: yes
+    owner: root
+    group: root
+    mode: 0644
+    block: |
+      # Disable autosuspend for Focusrite devices
+      SUBSYSTEM=="usb", ATTRS{idVendor}=="1235", TEST=="power/control", ATTR{power/control}="on"
