@@ -33,6 +33,7 @@
     state: '{{ item.value.state | default("present") }}'
   loop: '{{ custom_iptables_ports | dict2items }}'
   notify: 'save_ip{{ ipversion | default("4") }}tables'
+  when: custom_iptables_ports is defined
 
 - name: Permit ping
   become: yes
