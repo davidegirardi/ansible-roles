@@ -7,6 +7,7 @@
     regex: '^{{ item.key }}'
     line: 'options {{ item.key }} {{ item.value.params }}'
     create: yes
+    state: '{{ item.value.state | default("present") }}'
   loop: '{{ modules | dict2items }}'
 
 - name: Autoload module at boot
@@ -16,6 +17,7 @@
     regex: '^{{ item.key }}'
     line: '{{ item.key }}'
     create: yes
+    state: '{{ item.value.state | default("present") }}'
   loop: '{{ modules | dict2items }}'
 
 - name: Load module
