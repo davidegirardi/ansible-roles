@@ -1,5 +1,5 @@
 ---
-- name: Set authorized key taken from default RSA identity
+- name: Set authorized key from currently available public keys
   become: yes
   authorized_key:
     user: '{{ ssh_user }}'
