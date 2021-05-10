@@ -1,5 +1,14 @@
 ---
 
+- name: Install dependencies
+  vars:
+    packages:
+      present:
+      - gpg
+      - gpg-agent
+  include_role:
+    name: install_packages
+
 - name: Install keys
   become: yes
   apt_key:
