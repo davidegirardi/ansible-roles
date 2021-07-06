@@ -19,9 +19,8 @@
       present:
         - bridge-utils
         - dnsmasq
-        - ebtables
-        - iptables
         - libvirt
+        - iptables-nft
         - qemu
         - virt-manager
         - virt-viewer
