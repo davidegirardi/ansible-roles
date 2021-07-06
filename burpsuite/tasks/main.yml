@@ -1,0 +1,15 @@
+---
+- name: Install Java and Firefox
+  vars:
+    packages:
+      present:
+        - default-jre
+        - firefox-esr
+        - xterm
+  include_role:
+    name: install_packages
+
+- name: Copy burpsuite
+  copy:
+    src: ~/.burpsuite.jar
+    dest: burp.jar
