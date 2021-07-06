@@ -1,0 +1,20 @@
+---
+- name: Empty interfaces file
+  copy:
+    content: ""
+    dest: /etc/network/interfaces
+
+- name: Install NetworkManager
+  vars:
+    packages:
+      present:
+      - network-manager
+  include_role:
+    name: install_packages
+
+- name: Enable NetworkManager
+  vars:
+    services:
+      NetworkManager: started
+  include_role:
+    name: services
