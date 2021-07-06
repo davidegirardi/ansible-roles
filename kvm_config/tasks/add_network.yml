@@ -87,9 +87,3 @@
       line: allow {{ item.value.bridge }}
       create: yes
       mode: 0644
-  - name: Set permissions for bridge-helper
-    become: yes
-    file:
-      path: /usr/lib/qemu/qemu-bridge-helper
-      mode: +s
-
