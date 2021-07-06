@@ -1,0 +1,19 @@
+---
+- name: Install Texlive stuff
+  vars:
+    packages:
+      present:
+        - make
+        - ps2eps
+        - python3-pygments
+        - rubber
+        - texlive-fonts-recommended
+        - texlive-font-utils
+        - texlive-lang-european
+        - texlive-latex-extra
+        - texlive-luatex
+        - texlive-plain-generic
+        - texlive-xetex
+        - zathura
+  include_role:
+    name: install_packages
