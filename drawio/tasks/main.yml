@@ -1,0 +1,28 @@
+---
+- name: Install dependencies
+  vars:
+    packages:
+      present:
+        - libgtk-3-0
+        - libnotify4
+        - libnss3
+        - libxss1
+        - libxtst6
+        - xdg-utils
+        - libatspi2.0-0
+        - libappindicator3-1
+        - libsecret-1-0
+        - libasound2
+        - libgbm1
+        - libxshmfence1
+        - libx11-xcb1
+        - xterm
+  include_role:
+    name: install_packages
+
+- name: install drawio
+  become: yes
+  apt:
+    deb: 'https://github.com/jgraph/drawio-desktop/releases/download/v{{ drawio_version}}/drawio-amd64-{{ drawio_version }}.deb'
+    state: present
+    install_recommends: yes
