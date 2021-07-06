@@ -1,5 +1,13 @@
 ---
 
+- name: Install acl utilities
+  vars:
+    packages:
+      present:
+      - acl
+  include_role:
+    name: install_packages
+
 - name: 'Create shared paths for {{ sharing_group }}'
   become: yes
   file:
@@ -8,7 +16,7 @@
     path: '{{ item }}'
     owner: root
     group: '{{ sharing_group }}'
-    mode: u,g=rws,o=-rwx
+    mode: u=rwx,g=rws,o=-rwx
     state: directory
   with_items: '{{ shared_paths }}'
 
@@ -35,11 +43,17 @@
     permissions: rwX
   with_items: '{{ shared_paths }}'
 
+- name: Remove old permission cronjob
+  become: yes
+  file:
+    path: /etc/cron.daily/fix_shared_resources_permissions.sh
+    state: absent
+
 - name: Create permission fixing cronjob
   become: yes
   template:
     src: templates/fix_shared_resources_permissions.sh
-    dest: /etc/cron.daily/
+    dest: /etc/cron.daily/fix_shared_resources_permissions
     owner: root
     group: root
     mode: 0755
@@ -47,13 +61,13 @@
 - name: Populate owner group changes
   become: yes
   lineinfile:
-    path: /etc/cron.daily/fix_shared_resources_permissions.sh
+    path: /etc/cron.daily/fix_shared_resources_permissions
     line: 'chown -R root:{{ sharing_group }} {{ item }}'
   with_items: '{{ shared_paths }}'
 
 - name: Populate permissions
   become: yes
   lineinfile:
-    path: /etc/cron.daily/fix_shared_resources_permissions.sh
+    path: /etc/cron.daily/fix_shared_resources_permissions
     line: setfacl -Rm d:g:{{ sharing_group }}:rwX,g:{{ sharing_group }}:rwX '{{ item }}'
   with_items: '{{ shared_paths }}'
