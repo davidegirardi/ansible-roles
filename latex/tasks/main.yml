@@ -3,6 +3,9 @@
   vars:
     packages:
       present:
+        - aspell
+        - aspell-en
+        - fzf
         - make
         - ps2eps
         - python3-pygments
@@ -14,6 +17,8 @@
         - texlive-luatex
         - texlive-plain-generic
         - texlive-xetex
+        - tmux
+        - vim
         - zathura
   include_role:
     name: install_packages
