@@ -1,6 +1,6 @@
 ---
 
-- name: Set Debian-based KVM packages
+- name: Define Debian-based KVM packages
   set_fact:
     packages:
       present:
@@ -13,7 +13,7 @@
       - spice-client-gtk
   when: ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "Ubuntu"
 
-- name: Set Arch-based KVM packages
+- name: Define Arch-based KVM packages
   set_fact:
     packages:
       present:
@@ -30,12 +30,34 @@
   include_role:
     name: install_packages
 
-- name: Add networks to libvirtd
-  include_tasks:
-    file: '{{ role_path }}/tasks/add_network.yml'
-  loop: '{{ kvm_networks | dict2items }}'
-
-- name: Configure Samba for the virtual networks
-  include_tasks:
-    file: '{{ role_path }}/tasks/config_smb.yml'
-  loop: '{{ kvm_networks | dict2items }}'
+- name: Configure DNS resolution
+  block:
+  - name: Enable dnsmasq resolution in NetworkManager
+    become: yes
+    ini_file:
+      path: /etc/NetworkManager/conf.d/10-kvm-dns.conf
+      create: yes
+      mode: 0644
+      section: main
+      option: dns
+      value: dnsmasq
+    notify: 'reload_networkmanager'
+  - name: Create dnsmasq network-specific config file
+    file:
+      path: /etc/NetworkManager/dnsmasq.d/libvirtd_dnsmasq.conf
+      owner: root
+      group: root
+      mode: '0644'
+  - name: Disable systemd-resolved
+    become: yes
+    service:
+      name: systemd-resolved
+      enabled: no
+      state: stopped
+  - name: Use dnsmasq for name resolution
+    become: yes
+    lineinfile:
+      path: /etc/resolv.conf
+      regexp: '^nameserver'
+      line: nameserver 127.0.1.1
+    when: ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "Ubuntu"
