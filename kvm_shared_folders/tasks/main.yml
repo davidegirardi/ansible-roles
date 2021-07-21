@@ -1,0 +1,25 @@
+---
+- name: Create /host
+  become: yes
+  file:
+    path: /host
+    state: directory
+    mode: 0700
+    owner: user
+    group: user
+
+- name: Mount the filesyste
+  become: yes
+  mount:
+    path: /host
+    src: main
+    state: mounted
+    fstype: 9p
+    opts: trans=virtio
+
+- name: Link it to the shared directory
+  file:
+    state: link
+    path: host
+    src: /host
+
