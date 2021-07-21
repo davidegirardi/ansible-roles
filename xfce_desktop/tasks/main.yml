@@ -1,0 +1,19 @@
+---
+- name: Install XFCE
+  vars:
+    packages:
+      present:
+        - lightdm
+        - xfce4
+        - xfce4-goodies
+        - xorg
+        - spice-vdagent
+  include_role:
+    name: install_packages
+
+- name: Start login manager
+  vars:
+    services:
+      lightdm: started
+  include_role:
+    name: services
