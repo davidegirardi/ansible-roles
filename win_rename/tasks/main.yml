@@ -1,6 +1,8 @@
 - name: 'Change to {{ newhostname }}'
   ansible.windows.win_hostname:
-    name: '{{ newhostname }}'
+    # Remove the domain (if any)
+    # For example will set the name "example" for "example.domain.tld"
+    name: '{{  ansible_nodename.split(".")[0] | lower }}'
   register: changename
 
 - name: Reboot
