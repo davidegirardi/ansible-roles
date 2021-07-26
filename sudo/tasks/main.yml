@@ -1,9 +1,9 @@
 ---
-    - name: Configure sudo
-      become: yes
-      lineinfile:
-        path: '/etc/sudoers.d/{{ item.key }}'
-        line: '{{ item.value.entity }} ALL=(ALL:ALL) {{item.value.how }}:{{ item.value.path }}'
-        create: yes
-        mode: 0640
-      with_dict: '{{ sudo_config }}'
+  - name: Configure sudo
+    become: yes
+    lineinfile:
+      path: '/etc/sudoers.d/{{ item.key }}'
+      line: '{{ item.value.entity }} ALL=(ALL:ALL) {{item.value.how }}:{{ item.value.path }}'
+      create: yes
+      mode: 0640
+    with_dict: '{{ sudo_config }}'
