@@ -33,11 +33,3 @@
     log_path: c:\ansible_wu.txt
     reboot: yes
     reboot_timeout: 1800
-  register: update_result
-
-- name: WU results
-  debug:
-    msg: |
-        {% for k in update_result.updates %}
-        {{ update_result.updates[k].title }}
-        {% endfor %}
