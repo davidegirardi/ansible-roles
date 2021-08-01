@@ -1,2 +1,2 @@
 ---
-regenerate_ssh_keys: yes
+regenerate_sshd_keys: yes
