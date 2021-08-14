@@ -1,0 +1,19 @@
+- name: Retain systemd journal
+  block:
+    - name: Enable journald persistent storage
+      become: yes
+      ini_file:
+        path: /etc/systemd/journald.conf
+        section: Journal
+        option: Storage
+        value: persistent
+      notify: 'restart_journald'
+    - name: Configure retention
+      become: yes
+      ini_file:
+        path: /etc/systemd/journald.conf
+        section: Journal
+        option: MaxRetentionSec
+        value: 3month
+      notify: 'restart_journald'
+
