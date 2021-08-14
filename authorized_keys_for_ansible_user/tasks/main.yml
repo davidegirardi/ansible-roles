@@ -1,0 +1,9 @@
+---
+
+- name: Add authorized keys
+  authorized_key:
+    user: "{{ ansible_user_id }}"
+    state: present
+    key: "{{ item.value }}"
+  loop: "{{ ssh_keys | dict2items }}"
+
