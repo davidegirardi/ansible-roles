@@ -1,0 +1,12 @@
+---
+
+- name: Configure pacman options
+  become: yes
+  block:
+
+    - name: Color output
+      ini_file:
+        path: /etc/pacman.conf
+        section: options
+        allow_no_value: yes
+        option: Color
