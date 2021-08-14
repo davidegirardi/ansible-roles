@@ -15,7 +15,7 @@
     src: main
     state: mounted
     fstype: 9p
-    opts: trans=virtio
+    opts: trans=virtio,noauto,users
 
 - name: Link it to the shared directory
   file:
