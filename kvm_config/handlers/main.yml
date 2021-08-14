@@ -1,7 +1,15 @@
 ---
+
 - name: Reload NetworkManager
   become: yes
   service:
     name: NetworkManager
     state: reloaded
   listen: 'reload_networkmanager'
+
+- name: Restart libvirtd
+  become: yes
+  service:
+    name: libvirtd
+    state: restarted
+  listen: 'restart_libvirtd'

@@ -61,3 +61,20 @@
       regexp: '^nameserver'
       line: nameserver 127.0.1.1
     when: ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "Ubuntu"
+
+- name: Run QEMU as specific user (for sharing folders)
+  block:
+    - name: Set the user
+      become: yes
+      lineinfile:
+        path: /etc/libvirt/qemu.conf
+        regexp: '^user = '
+        line: 'user = "{{ qemu_user }}"'
+      notify: 'restart_libvirtd'
+    - name: Set the group
+      become: yes
+      lineinfile:
+        path: /etc/libvirt/qemu.conf
+        regexp: '^group = '
+        line: 'group = "{{ qemu_group }}"'
+      notify: 'restart_libvirtd'
