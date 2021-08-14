@@ -1,6 +1,7 @@
 ---
-- name: Install XFCE
-  vars:
+
+- name: Select packages for Debian-based distros
+  set_fact:
     packages:
       present:
         - lightdm
@@ -8,6 +9,24 @@
         - xfce4-goodies
         - xorg
         - spice-vdagent
+  when: ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "Ubuntu"
+
+
+- name: Select packages for Arch-based distros
+  set_fact:
+    packages:
+      present:
+        - lightdm-gtk-greeter
+        - lightdm-gtk-greeter-settings
+        - spice-vdagent
+        - xfce4
+        - xfce4-goodies
+        - xf86-video-qxl
+        - xorg
+  when: ansible_facts['os_family'] == "Archlinux"
+
+
+- name: Install XFCE
   include_role:
     name: install_packages
 
