@@ -6,6 +6,7 @@
         - aspell
         - aspell-en
         - fzf
+        - git
         - make
         - ps2eps
         - python3-pygments
