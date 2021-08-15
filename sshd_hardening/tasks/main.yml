@@ -23,6 +23,7 @@
       - sshguard
   include_role:
     name: install_packages
+  when: ansible_distribution_release != "bullseye"
 
 - name: Enable sshguard
   vars:
@@ -30,6 +31,7 @@
       sshguard: started
   include_role:
     name: services
+  when: ansible_distribution_release != "bullseye"
 
     #- name: Get existing iptables rules
     #  become: true

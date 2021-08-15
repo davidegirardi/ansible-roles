@@ -8,7 +8,7 @@
 - name: Enable non-free security repositories
   become: yes
   apt_repository:
-    repo: deb http://deb.debian.org/debian-security/ {{ ansible_distribution_release }}/updates contrib non-free
+    repo: deb http://deb.debian.org/debian-security/ {{ ansible_distribution_release }}-security contrib non-free
 
 - name: Enable non-free updates repositories
   become: yes
