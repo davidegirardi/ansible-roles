@@ -1,2 +1,3 @@
 ---
 regenerate_sshd_keys: yes
+reboot: yes

@@ -7,5 +7,6 @@
   async: 1
   poll: 0
   failed_when: False
+  when: reboot
   listen: 'reboot_needed'
 
