@@ -9,6 +9,13 @@
   become: yes
   apt_repository:
     repo: deb http://deb.debian.org/debian-security/ {{ ansible_distribution_release }}-security contrib non-free
+  when: ansible_distribution_release != 'buster'
+
+- name: Enable non-free security repositories (buster)
+  become: yes
+  apt_repository:
+    repo: deb http://deb.debian.org/debian-security/ {{ ansible_distribution_release }}/updates contrib non-free
+  when: ansible_distribution_release == 'buster'
 
 - name: Enable non-free updates repositories
   become: yes
