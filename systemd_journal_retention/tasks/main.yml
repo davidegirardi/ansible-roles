@@ -14,6 +14,6 @@
         path: /etc/systemd/journald.conf
         section: Journal
         option: MaxRetentionSec
-        value: 3month
+        value: "{{ journald_retention }}"
       notify: 'restart_journald'
 
