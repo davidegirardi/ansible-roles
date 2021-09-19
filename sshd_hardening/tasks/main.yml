@@ -16,6 +16,14 @@
     line: 'AllowAgentForwarding no'
   notify: 'restart_sshd'
 
+- name: Disable KbdInteractiveAuthentication
+  become: yes
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^KbdInteractiveAuthentication\ '
+    line: 'KbdInteractiveAuthentication no'
+  notify: 'restart_sshd'
+
 - name: Install sshguard
   vars:
     packages:
