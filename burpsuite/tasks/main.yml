@@ -13,3 +13,8 @@
   copy:
     src: ~/.burpsuite.jar
     dest: burp.jar
+
+- name: Copy burpsuite license
+  copy:
+    src: ~/.burpsuite.license
+    dest: burp.license
