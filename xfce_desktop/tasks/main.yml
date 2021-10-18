@@ -9,6 +9,7 @@
         - xfce4-goodies
         - xorg
         - spice-vdagent
+        - xserver-xorg-video-qxl
   when: ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "Ubuntu"
 
 
@@ -30,9 +31,10 @@
   include_role:
     name: install_packages
 
-- name: Start login manager
+- name: Start necessary services
   vars:
     services:
       lightdm: started
+      spice-vdagent: started
   include_role:
     name: services
