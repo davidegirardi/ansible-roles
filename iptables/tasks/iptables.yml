@@ -22,7 +22,7 @@
     jump: ACCEPT
   notify: 'save_ip{{ ipversion | default("4") }}tables'
 
-- name: Apply INPUT whitelisting
+- name: Apply port INPUT whitelisting
   become: yes
   iptables:
     ip_version: 'ipv{{ ipversion | default("4") }}'
@@ -31,9 +31,20 @@
     protocol: '{{ item.value.protocol }}'
     jump: '{{ item.value.jump }}'
     state: '{{ item.value.state | default("present") }}'
-  loop: '{{ custom_iptables_ports | dict2items }}'
+  when: item.value.port is defined
+  loop: '{{ custom_iptables_whitelisting | default({}) | dict2items }}'
   notify: 'save_ip{{ ipversion | default("4") }}tables'
-  when: custom_iptables_ports is defined
+
+- name: Apply interface INPUT whitelisting
+  become: yes
+  iptables:
+    ip_version: 'ipv{{ ipversion | default("4") }}'
+    chain: '{{ item.value.chain }}'
+    in_interface: '{{ item.value.in_interface }}'
+    jump: '{{ item.value.jump }}'
+  when: item.value.in_interface is defined
+  loop: '{{ custom_iptables_whitelisting | default({}) | dict2items }}'
+  notify: 'save_ip{{ ipversion | default("4") }}tables'
 
 - name: Permit ping
   become: yes
