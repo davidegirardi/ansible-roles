@@ -18,3 +18,13 @@
   copy:
     src: ~/.burpsuite.license
     dest: burp.license
+
+- name: Copy default user options
+  copy:
+    src: ~/.burpsuite.default_user_options.burp.json
+    dest: default_user_options.burp.json
+
+- name: Copy default project options
+  copy:
+    src: ~/.burpsuite.default_project_options.burp.json
+    dest: default_project_options.burp.json
