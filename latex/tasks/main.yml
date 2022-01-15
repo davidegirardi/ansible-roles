@@ -20,6 +20,7 @@
         - texlive-xetex
         - tmux
         - vim
+        - xterm
         - zathura
   include_role:
     name: install_packages
