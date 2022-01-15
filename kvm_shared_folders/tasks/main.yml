@@ -1,25 +1,18 @@
 ---
-- name: Create /host
+- name: Create host directory in home directory
   become: yes
   file:
-    path: /host
+    path: "{{ ansible_env.HOME }}/host"
     state: directory
     mode: 0700
     owner: user
     group: user
 
-- name: Mount the filesyste
+- name: Mount the filesystem
   become: yes
   mount:
-    path: /host
+    path: "{{ ansible_env.HOME }}/host"
     src: main
     state: mounted
     fstype: 9p
     opts: trans=virtio,noauto,users
-
-- name: Link it to the shared directory
-  file:
-    state: link
-    path: host
-    src: /host
-
