@@ -7,8 +7,4 @@
 
 - name: Reboot
   ansible.windows.win_reboot:
-    reboot_timeout: 2
-  async: 1
-  poll: 0
-  failed_when: true == false
   when: changename.reboot_required
