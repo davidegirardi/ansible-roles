@@ -2,7 +2,7 @@
 
 - name: Select packages for Debian-based distros
   set_fact:
-    packages:
+    local_packages:
       present:
         - lightdm
         - xfce4
@@ -10,31 +10,35 @@
         - xorg
         - spice-vdagent
         - xserver-xorg-video-qxl
+    local_services:
+      lightdm: started
+      spice-vdagent: started
   when: ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "Ubuntu"
 
 
 - name: Select packages for Arch-based distros
   set_fact:
-    packages:
+    local_packages:
       present:
         - lightdm-gtk-greeter
         - lightdm-gtk-greeter-settings
         - spice-vdagent
         - xfce4
         - xfce4-goodies
-        - xf86-video-qxl
         - xorg
+    local_services:
+      lightdm: started
   when: ansible_facts['os_family'] == "Archlinux"
 
 
 - name: Install XFCE
+  vars:
+    packages: "{{ local_packages }}"
   include_role:
     name: install_packages
 
 - name: Start necessary services
   vars:
-    services:
-      lightdm: started
-      spice-vdagent: started
+    services: "{{ local_services }}"
   include_role:
     name: services
