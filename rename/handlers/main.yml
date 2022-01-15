@@ -1,5 +1,12 @@
 ---
 
+- name: Restart sshd
+  become: yes
+  service:
+    name: sshd
+    state: restarted
+  listen: 'restart_sshd'
+
 - name: Reboot
   become: yes
   reboot:
