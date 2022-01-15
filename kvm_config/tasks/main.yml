@@ -32,6 +32,13 @@
 
 - name: Configure DNS resolution
   block:
+  - name: Create dnsmasq config directory for NetworkManager
+    file:
+      path: /etc/NetworkManager/dnsmasq.d
+      state: directory
+      owner: root
+      group: root
+      mode: '0755'
   - name: Enable dnsmasq resolution in NetworkManager
     become: yes
     ini_file:
