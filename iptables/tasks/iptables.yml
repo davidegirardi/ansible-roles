@@ -51,7 +51,7 @@
   iptables:
     ip_version: 'ipv{{ ipversion | default("4") }}'
     chain: INPUT
-    protocol: "{{ 'icmpv6' if ipversion == 6 else 'icmp' | default('icmp')}}"
+    protocol: "{{ 'icmpv6' if ipversion == 6 else 'icmp' | default('icmp') }}"
     icmp_type: echo-request
     jump: ACCEPT
   when: iptables_allow_ping

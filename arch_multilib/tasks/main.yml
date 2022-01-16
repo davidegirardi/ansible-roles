@@ -8,9 +8,4 @@
       [multilib]
       Include = /etc/pacman.d/mirrorlist
   register: addmultilib
-
-- name: Update pacman cache
-  become: yes
-  pacman:
-    update_cache: yes
-  when: addmultilib.changed
+  notify: 'update_pacman_cache'

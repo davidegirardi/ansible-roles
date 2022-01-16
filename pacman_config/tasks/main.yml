@@ -10,3 +10,4 @@
         section: options
         allow_no_value: yes
         option: Color
+        mode: '0644'

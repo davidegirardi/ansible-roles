@@ -1,9 +1,10 @@
 ---
-
-- set_fact:
+- name: Configure iptables save path
+  set_fact:
     iptables_save_path: /etc/iptables/iptables.rules
 
-- set_fact:
+- name: Configure ip6tables save path
+  set_fact:
     ip6tables_save_path: /etc/iptables/ip6tables.rules
 
 - name: Enable and start iptables

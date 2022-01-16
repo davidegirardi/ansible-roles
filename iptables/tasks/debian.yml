@@ -8,10 +8,12 @@
   include_role:
     name: install_packages
 
-- set_fact:
+- name: Configure iptables save path
+  set_fact:
     iptables_save_path: /etc/iptables/rules.v4
 
-- set_fact:
+- name: Configure ip6tables save path
+  set_fact:
     ip6tables_save_path: /etc/iptables/rules.v6
 
 - name: Enable and start netfilter-persistent.service

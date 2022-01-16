@@ -1,13 +1,13 @@
 ---
 
 - name: Check X11 keyboard settings
-  shell: localectl status
+  command: localectl status
   register: localestatus
   changed_when: false
 
 - name: Set X11 keyboard settings
   become: yes
-  shell: localectl set-x11-keymap us pc104 altgr-intl caps:escape_shifted_capslock
+  command: localectl set-x11-keymap us pc104 altgr-intl caps:escape_shifted_capslock
   when: "localestatus.stdout_lines is defined and (
         localestatus.stdout_lines[0].find('System Locale: LANG=en_US.UTF-8') == -1 or
         localestatus.stdout_lines[1].find('VC Keymap: us') == -1 or
