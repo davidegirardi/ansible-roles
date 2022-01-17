@@ -9,6 +9,7 @@
     shell: '{{ account_shell }}'
     state: present
     update_password: on_create
+    password_lock: "{{ password_lock }}"
   with_dict: '{{ accounts }}'
 
 - name: Add authorized_keys

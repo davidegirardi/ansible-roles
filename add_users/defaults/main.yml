@@ -1,1 +1,2 @@
 account_shell: /bin/bash
+password_lock: no
