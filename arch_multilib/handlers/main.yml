@@ -1,0 +1,7 @@
+---
+
+- name: Update pacman cache
+  become: yes
+  pacman:
+    update_cache: yes
+  listen: 'update_pacman_cache'
