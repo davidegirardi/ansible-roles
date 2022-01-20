@@ -63,7 +63,7 @@
       line: 'hosts: libvirt_guest \1'
       backrefs: yes
 
-- name: Run QEMU as specific user (for sharing folders)
+- name: Run QEMU as low privileged user
   block:
     - name: Set the user
       become: yes
