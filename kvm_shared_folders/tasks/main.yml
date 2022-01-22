@@ -1,12 +1,9 @@
 ---
 - name: Create host directory in home directory
-  become: yes
+  become: no
   file:
     path: "{{ ansible_env.HOME }}/host"
     state: directory
-    mode: 0700
-    owner: user
-    group: user
 
 - name: Mount the filesystem
   become: yes
