@@ -25,3 +25,10 @@
           - docker-ce
   include_role:
     name: unofficial_repositories
+
+- name: Enable docker service
+  vars:
+    services:
+      docker: started
+  include_role:
+    name: services
