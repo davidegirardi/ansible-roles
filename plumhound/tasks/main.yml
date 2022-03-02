@@ -41,3 +41,32 @@
     block: |
       cd ~/PlumHound
       python3 PlumHound.py -s "bolt://0.0.0.0:7687" -u "neo4j" -p "{{ neo4j_password }}" --ox stdout -v1000 $*
+
+- name: Install Bloodhound
+  block:
+    - name: Install dependencies
+      vars:
+        packages:
+          present:
+            - unzip
+            - libnss3
+      include_role:
+        name: install_packages
+    - name: Install XFCE
+      include_role:
+        name: xfce_desktop
+    - name: Create directory
+      file:
+        path: gui
+        state: directory
+        mode: 0700
+    - name: Download BloodHound
+      unarchive:
+        src: https://github.com/BloodHoundAD/BloodHound/releases/download/rolling/BloodHound-linux-x64.zip
+        remote_src: yes
+        dest: gui
+    - name: Clone BloodHound
+      git:
+        depth: 1
+        repo: https://github.com/fox-it/BloodHound.py.git
+        dest: bloodhoundpy
