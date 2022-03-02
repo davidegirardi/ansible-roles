@@ -7,18 +7,19 @@
   include_role:
     name: install_packages
 
-- name: Add tunnel user
+- name: Add tunnel users
   become: yes
   user:
-    name: tunnel
+    name: "{{ item }}"
     shell: /bin/false
+  loop: "{{ tunnel_users }}"
 
-- name: Configure sshd for tunnel
+- name: Configure sshd for the tunnel users
   become: yes
   blockinfile:
     path: /etc/ssh/sshd_config
     block: |
-      Match User tunnel
+      Match User {{ item }}
         PasswordAuthentication yes
         MaxSessions 1 
         AllowTcpForwarding remote 
@@ -27,8 +28,9 @@
         GatewayPorts no 
         AllowAgentForwarding no 
         ForceCommand echo 'This account can only be used for port forwarding'
-  register: sshd_config_updated
+    marker: "# {mark} ANSIBLE MANAGED BLOCK {{ item }}"
   notify: 'restart_sshd'
+  loop: "{{ tunnel_users }}"
 
 - name: Copy one-time password generation script
   become: yes
