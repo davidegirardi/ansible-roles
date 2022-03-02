@@ -1,0 +1,29 @@
+---
+- name: Remove packaged Golang
+  vars:
+    packages:
+      absent:
+        - golang
+      present:
+        - build-essential
+        - git
+  include_role:
+    name: install_packages
+
+- name: Install Golang
+  become: yes
+  block:
+    - name: Download and extract Golang
+      unarchive:
+        creates: /usr/local/go
+        dest: /usr/local
+        remote_src: yes
+        src: "{{ go_download_url }}"
+    - name: Symlink executables
+      file:
+        src: "{{ item.key }}"
+        dest: "{{ item.value }}"
+        state: link
+      with_dict:
+        - /usr/local/go/bin/go: /usr/local/bin/go
+        - /usr/local/go/bin/gofmt: /usr/local/bin/gofmt
