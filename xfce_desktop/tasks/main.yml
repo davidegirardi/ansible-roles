@@ -23,6 +23,7 @@
         - lightdm-gtk-greeter
         - lightdm-gtk-greeter-settings
         - spice-vdagent
+        - ttf-droid
         - xfce4
         - xfce4-goodies
         - xorg
