@@ -1,11 +1,11 @@
 ---
 
-- include: init.yml
+- include_tasks: init.yml
 
-- include: iptables.yml
+- include_tasks: iptables.yml
   vars:
     ipversion: 4
 
-- include: iptables.yml
+- include_tasks: iptables.yml
   vars:
     ipversion: 6
