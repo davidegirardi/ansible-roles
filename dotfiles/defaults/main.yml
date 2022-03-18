@@ -1,0 +1,17 @@
+---
+# On the left: file/directory inside $DOTFILES
+# On the right: path in the home directory
+dotfiles:
+
+  bashrc: .bashrc
+  bashrc.local.vm: .bashrc.local
+  config/nvim/: .config/nvim/
+  config/systemd/: .config/systemd/
+  config/xfce4/terminal/accels.scm: .config/xfce4/terminal/accels.scm
+  config/xfce4/terminal/terminalrc: .config/xfce4/terminal/terminalrc
+  config/zathura/zathurarc: .config/zathura/zathurarc
+  gvimrc: .gvimrc
+  pam_environment: .pam_environment
+  vim: .vim
+  x3270pro.english: .x3270pro
+  Xresources: .Xresources

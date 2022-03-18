@@ -1,0 +1,25 @@
+---
+
+- name: Install rsync
+  vars:
+    packages:
+      present:
+        - rsync
+  include_role:
+    name: install_packages
+
+- name: Create necessary directories
+  become: no
+  file:
+    path: "{{ item.value | dirname }}"
+    state: directory
+    mode: u=rwX,g=,o=
+  when: item.value | dirname != ""
+  loop: '{{ dotfiles | dict2items }}'
+
+- name: Synchronize files
+  become: no
+  synchronize:
+    src: "{{ lookup('env', 'DOTFILES_PATH') }}/{{ item.key }}"
+    dest: "{{ item.value }}"
+  loop: '{{ dotfiles | dict2items }}'
