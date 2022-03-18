@@ -1,30 +1,50 @@
 ---
-- name: Install Java and Firefox
-  vars:
-    packages:
+- name: Select packages for Debian-based distros
+  set_fact:
+    local_packages:
       present:
         - default-jre
         - firefox-esr
-        - xterm
+    local_services:
+      lightdm: started
+      spice-vdagent: started
+  when: ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "Ubuntu"
+
+- name: Select packages for Arch-based distros
+  set_fact:
+    local_packages:
+      present:
+        - jre-openjdk
+        - firefox
+      absent:
+        - jre11-openjdk
+    local_services:
+      lightdm: started
+  when: ansible_facts['os_family'] == "Archlinux"
+
+- name: Install Java and Firefox
+  vars:
+    packages: "{{ local_packages }}"
   include_role:
     name: install_packages
 
+- name: Create burpsuite directory
+  file:
+    path: burpsuite
+    state: directory
+    mode: u=rwX,g=,o=
+
+- name: Burp files
+  set_fact:
+    burp_files:
+      ~/.burpsuite.jar: burpsuite/burp.jar
+      ~/.burpsuite.license: burpsuite/burpsuite.license
+      ~/.burpsuite.default_user_options.burp.json: burpsuite/burpsuite.default_user_options.burp.json
+      ~/.burpsuite.default_project_options.burp.json: burpsuite/burpsuite.default_project_options.burp.json
+
 - name: Copy burpsuite
-  copy:
-    src: ~/.burpsuite.jar
-    dest: burp.jar
-
-- name: Copy burpsuite license
-  copy:
-    src: ~/.burpsuite.license
-    dest: burp.license
-
-- name: Copy default user options
-  copy:
-    src: ~/.burpsuite.default_user_options.burp.json
-    dest: default_user_options.burp.json
-
-- name: Copy default project options
-  copy:
-    src: ~/.burpsuite.default_project_options.burp.json
-    dest: default_project_options.burp.json
+  synchronize:
+    src: "{{ item.key }}"
+    dest: "{{ item.value }}"
+    copy_links: yes
+  loop: "{{ burp_files | dict2items }}"
