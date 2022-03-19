@@ -1,0 +1,10 @@
+---
+
+- name: Alpine install packages
+  become: yes
+  apk:
+    available: yes
+    name: '{{ item.value }}'
+    state: '{{ item.key }}'
+    update_cache: yes
+  with_dict: '{{ packages }}'

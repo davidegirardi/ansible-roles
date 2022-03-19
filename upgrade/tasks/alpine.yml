@@ -1,0 +1,7 @@
+---
+- name: Update all packages to the latest version
+  become: yes
+  apk:
+    available: yes
+    update_cache: yes
+    upgrade: yes
