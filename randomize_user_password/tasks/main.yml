@@ -5,5 +5,4 @@
   user:
     name: '{{ item.key }}'
     password: "{{ lookup('password', '/dev/null chars=ascii_letters,digits length=32 encrypt=sha512_crypt') }}"
-  with_dict: '{{ accounts }}'
-  register: usertest
+  with_dict: '{{ accounts_to_reset }}'
