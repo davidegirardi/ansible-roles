@@ -79,3 +79,20 @@
         regexp: '^group = '
         line: 'group = "{{ qemu_group }}"'
       notify: 'restart_libvirtd'
+
+- name: Configure libvirt-guests
+  become: yes
+  lineinfile:
+    path: /etc/conf.d/libvirt-guests
+    line: "ON_SHUTDOWN={{ on_shutdown }}"
+    mode: 0644
+    owner: root
+    group: root
+    create: yes
+
+- name: Start libvirt-guests
+  become: yes
+  service:
+    name: libvirt-guests
+    enabled: yes
+    state: started

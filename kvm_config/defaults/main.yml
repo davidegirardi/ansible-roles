@@ -1,3 +1,4 @@
 ---
 qemu_user: '{{ ansible_user }}'
 qemu_group: '{{ ansible_user }}'
+on_shutdown: shutdown
