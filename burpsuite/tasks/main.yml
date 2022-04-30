@@ -5,6 +5,7 @@
       present:
         - default-jre
         - firefox-esr
+        - rsync
     local_services:
       lightdm: started
       spice-vdagent: started
