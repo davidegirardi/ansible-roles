@@ -50,6 +50,7 @@
           present:
             - unzip
             - libnss3
+            - libxss1
       include_role:
         name: install_packages
     - name: Install XFCE
