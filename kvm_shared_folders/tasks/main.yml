@@ -12,4 +12,5 @@
     src: main
     state: mounted
     fstype: 9p
-    opts: trans=virtio,noauto,users
+    opts: trans=virtio,users
+    boot: "{{ automount }}"
