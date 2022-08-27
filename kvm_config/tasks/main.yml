@@ -32,29 +32,12 @@
 
 - name: Configure DNS resolution
   block:
-  - name: Delete dnsmasq config directory for NetworkManager
-    become: yes
-    file:
-      path: /etc/NetworkManager/dnsmasq.d
-      state: absent
-  - name: Disable dnsmasq resolution in NetworkManager
-    become: yes
-    file:
-      path: /etc/NetworkManager/conf.d/10-kvm-dns.conf
-      state: absent
-    notify: 'reload_networkmanager'
-  - name: Delete dnsmasq network-specific config file
-    become: yes
-    file:
-      path: /etc/NetworkManager/dnsmasq.d/libvirtd_dnsmasq.conf
-      state: absent
   - name: Enable systemd-resolved
     become: yes
     service:
       name: systemd-resolved
       enabled: yes
       state: started
-
   - name: Add libvirt_guest to nsswitch
     become: yes
     lineinfile:
