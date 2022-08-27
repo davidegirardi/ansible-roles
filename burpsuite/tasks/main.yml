@@ -17,6 +17,9 @@
       present:
         - jre-openjdk
         - firefox
+        - rsync
+        - xorg-xauth
+        - xorg-xhost
       absent:
         - jre11-openjdk
     local_services:
