@@ -1,0 +1,124 @@
+---
+- name: Select packages for Debian-based distros
+  set_fact:
+    local_packages:
+      present:
+        - wireguard
+        - wireguard-tools
+  when: ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "Ubuntu"
+
+- name: Select packages for Arch-based distros
+  set_fact:
+    local_packages:
+      present:
+        - wireguard-tools
+  when: ansible_facts['os_family'] == "Archlinux"
+
+- name: Install Wireguard
+  vars:
+    packages: "{{ local_packages }}"
+  include_role:
+    name: install_packages
+
+- name: Check server private key
+  become: true
+  stat:
+    path: "/etc/wireguard/{{ wg_interface_name }}-private_key"
+  register: private_key_file
+
+- name: Generate server keys
+  block:
+    - name: Generate server private key
+      shell: |
+        wg genkey
+      register: cmd_server_private_key
+    - name: Generate server public key
+      shell: |
+        echo "{{ cmd_server_private_key.stdout }}" | wg pubkey
+      register: cmd_server_public_key
+    - name: Set server keys
+      set_fact:
+        server_private_key: "{{ cmd_server_private_key.stdout }}"
+        server_public_key: "{{ cmd_server_public_key.stdout }}"
+  when: not private_key_file.stat.exists
+
+- name: Load server parameters
+  become: true
+  block:
+    - name: Slurp server private key
+      slurp:
+        src: "/etc/wireguard/{{ wg_interface_name }}-private_key"
+      register: slurp_server_private_key
+    - name: Set server private key
+      become: true
+      set_fact:
+        server_private_key: "{{ slurp_server_private_key['content'] | b64decode }}"
+    - name: Slurp server public key
+      slurp:
+        src: "/etc/wireguard/{{ wg_interface_name }}-public_key"
+      register: slurp_server_public_key
+    - name: Set server public key
+      become: true
+      set_fact:
+        server_public_key: "{{ slurp_server_public_key['content'] | b64decode }}"
+  when: private_key_file.stat.exists
+
+- name: Save server private key
+  become: true
+  copy:
+    dest: "/etc/wireguard/{{ wg_interface_name }}-private_key"
+    owner: root
+    group: root
+    mode: 0600
+    content: "{{ server_private_key }}"
+
+- name: Save server public key
+  become: true
+  copy:
+    dest: "/etc/wireguard/{{ wg_interface_name }}-public_key"
+    owner: root
+    group: root
+    mode: 0600
+    content: "{{ server_public_key }}"
+
+- name: Generate server config
+  set_fact:
+    server_config: |
+      [Interface]
+      PrivateKey = {{ server_private_key }}
+      Address = {{ wg_server_private_address }}
+      ListenPort = {{ wg_port }}
+      {% for peer in peers | dict2items %}
+      [Peer]
+      PublicKey = {{ peer.value.public_key }}
+      AllowedIPs = {{ peer.value.allowed_ips }}
+      {% endfor %}
+
+- name: Save server config
+  become: true
+  copy:
+    dest: "/etc/wireguard/{{ wg_interface_name }}.conf"
+    content: "{{ server_config }}"
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Run service
+  become: true
+  service:
+    name: "wg-quick@{{ wg_interface_name }}"
+    state: started
+    enabled: true
+
+- name: Save server config
+  become: true
+  copy:
+    dest: "/etc/wireguard/{{ wg_interface_name }}.conf"
+    content: "{{ server_config }}"
+    owner: root
+    group: root
+    mode: 0600
+  notify: 'restart_wireguard'
+
+- include_tasks: generate_client_config.yml
+  loop: "{{ peers | dict2items }}"

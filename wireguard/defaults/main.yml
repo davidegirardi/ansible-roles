@@ -1,0 +1,7 @@
+wg_port: 51820
+wg_private_network: 172.24.100.0/24
+wg_server_private_address: 172.24.100.1/32
+wg_server_public_address: "{{ hostvars[inventory_hostname].inventory_hostname }}"
+wg_target_networks: ", 0.0.0.0/0"
+wg_interface_name: wg0
+wg_persistent_keepalive: "PersistentKeepalive = 25"

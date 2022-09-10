@@ -1,0 +1,29 @@
+---
+
+- name: Generate client config
+  delegate_to: localhost
+  set_fact:
+    client_config: |
+      [Interface]
+      PrivateKey = CHANGEME
+      Address = {{ item.value.allowed_ips }}
+
+      [Peer]
+      PublicKey = {{ server_public_key }}
+      AllowedIPs = {{ wg_private_network }}{{ wg_target_networks }}
+      Endpoint = {{ wg_server_public_address }}:{{ wg_port }}
+      {{ wg_persistent_keepalive }}
+
+- name: Create client configuration directory
+  delegate_to: localhost
+  file:
+    path: client_configurations
+    state: directory
+    mode: 0700
+
+- name: Create template client configuration file
+  delegate_to: localhost
+  copy:
+    dest: "client_configurations/{{ item.key }}-{{ wg_interface_name }}.conf"
+    content: "{{ client_config }}"
+    mode: 0600
