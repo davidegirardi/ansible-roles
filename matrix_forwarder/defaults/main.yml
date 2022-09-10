@@ -1,0 +1,64 @@
+---
+matrix_in_interface: '{{ hostvars[inventory_hostname]["ansible_default_ipv4"]["interface"] }}'
+matrix_out_interface: '{{ hostvars[inventory_hostname]["ansible_default_ipv4"]["interface"] }}'
+matrix_forwarding_ports:
+
+  HTTP:
+    port: 80
+    protocol: tcp
+    chain: INPUT
+    jump: ACCEPT
+
+  HTTPS:
+    port: 443
+    protocol: tcp
+    chain: INPUT
+    jump: ACCEPT
+
+  Coturn-TURN-TCP:
+    port: 3478
+    protocol: tcp
+    chain: INPUT
+    jump: ACCEPT
+
+  Jitsi-harvester-fallback:
+    port: 4443
+    protocol: tcp
+    chain: INPUT
+    jump: ACCEPT
+
+  Coturn-TURN-TCP-fallback-video-audio:
+    port: 5349
+    protocol: tcp
+    chain: INPUT
+    jump: ACCEPT
+
+  Matrix-federation:
+    port: 8448
+    protocol: tcp
+    chain: INPUT
+    jump: ACCEPT
+
+  Coturn-TURN-UDP:
+    port: 3748
+    protocol: udp
+    chain: INPUT
+    jump: ACCEPT
+
+  Coturn-TURN-video-audio:
+    port: 5349
+    protocol: udp
+    chain: INPUT
+    jump: ACCEPT
+
+  Jitsi-RTP-media:
+    port: 10000
+    protocol: udp
+    chain: INPUT
+    jump: ACCEPT
+
+  TURN:
+    port: 49152:49172
+    protocol: udp
+    chain: INPUT
+    jump: ACCEPT

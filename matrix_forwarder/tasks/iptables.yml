@@ -1,0 +1,26 @@
+---
+
+- name: Forward matrix ports
+  become: true
+  iptables:
+    ip_version: 'ipv{{ ipversion | default("4") }}'
+    table: nat
+    chain: PREROUTING
+    in_interface: '{{ matrix_in_interface }}'
+    destination_port: '{{ item.value.port }}'
+    protocol: '{{ item.value.protocol }}'
+    jump: 'DNAT'
+    to_destination: '{{ matrix_private_ip }}'
+    comment: '{{ item.key }}'
+  loop: '{{ matrix_forwarding_ports | dict2items }}'
+
+- name: Enable masquerading
+  become: true
+  iptables:
+    ip_version: 'ipv{{ ipversion | default("4") }}'
+    table: nat
+    chain: POSTROUTING
+    out_interface: '{{ matrix_out_interface }}'
+    jump: 'MASQUERADE'
+    source: '{{ matrix_private_ip }}'
+    comment: 'Masquerade host from wg0'

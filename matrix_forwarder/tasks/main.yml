@@ -1,0 +1,17 @@
+---
+
+- include: iptables.yml
+  vars:
+    ipversion: 4
+
+- name: Enable IPv4 forwarding
+  become: true
+  sysctl:
+    name: net.ipv4.ip_forward
+    value: 1
+
+- name: Allow traffic
+  vars:
+    custom_iptables_whitelisting: "{{ matrix_forwarding_ports }}"
+  include_role:
+    name: iptables
