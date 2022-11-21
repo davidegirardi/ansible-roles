@@ -1,29 +1,40 @@
 ---
 
 - name: Define Debian-based KVM packages
-  set_fact:
-    packages:
-      present:
-      - gir1.2-spiceclientgtk-3.0
-      - dnsmasq
-      - libvirt-clients
-      - libvirt-daemon-system
-      - qemu-kvm
-      - qemu-utils
-      - spice-client-gtk
+  block:
+    - name: Required packages
+      set_fact:
+        packages:
+          present:
+          - gir1.2-spiceclientgtk-3.0
+          - dnsmasq
+          - libvirt-clients
+          - libvirt-daemon-system
+          - libnss-libvirt
+          - qemu-kvm
+          - qemu-utils
+          - spice-client-gtk
+    - name: Libvirt guests file path
+      set_fact:
+        libvirt_guest_filename: /etc/default/libvirt-guests
   when: ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "Ubuntu"
 
 - name: Define Arch-based KVM packages
-  set_fact:
-    packages:
-      present:
-        - bridge-utils
-        - dnsmasq
-        - libvirt
-        - iptables-nft
-        - qemu
-        - virt-manager
-        - virt-viewer
+  block:
+    - name: Required packages
+      set_fact:
+        packages:
+          present:
+            - bridge-utils
+            - dnsmasq
+            - libvirt
+            - iptables-nft
+            - qemu
+            - virt-manager
+            - virt-viewer
+    - name: Libvirt guests file path
+      set_fact:
+        libvirt_guest_filename: /etc/conf.d/libvirt-guests
   when: ansible_facts['os_family'] == "Archlinux"
 
 - name: Install packages
@@ -63,10 +74,19 @@
         line: 'group = "{{ qemu_group }}"'
       notify: 'restart_libvirtd'
 
+- name: Configure security driver
+  become: yes
+  lineinfile:
+    path: /etc/libvirt/qemu.conf
+    regexp: '^security_driver = '
+    line: 'security_driver = "none"'
+  notify: 'restart_libvirtd'
+  when: ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "Ubuntu"
+
 - name: Configure libvirt-guests
   become: yes
   lineinfile:
-    path: /etc/conf.d/libvirt-guests
+    path: '{{ libvirt_guest_filename }}'
     line: "ON_SHUTDOWN={{ on_shutdown }}"
     mode: 0644
     owner: root
