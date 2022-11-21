@@ -6,6 +6,7 @@
       present:
       - efitools
       - binutils
+      - sbsigntools
   include_role:
     name: install_packages
 
