@@ -6,6 +6,7 @@ dotfiles:
   bashrc: .bashrc
   bashrc.local.vm: .bashrc.local
   config/nvim/: .config/nvim/
+  config/picom.conf: .config/picom.conf
   config/systemd/: .config/systemd/
   config/xfce4/terminal/accels.scm: .config/xfce4/terminal/accels.scm
   config/xfce4/terminal/terminalrc: .config/xfce4/terminal/terminalrc
