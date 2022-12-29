@@ -1,4 +1,4 @@
 ---
 dropbear_keys:
-  - "{{ lookup('file', '~/.ssh/id_rsa.pub') }}"
+  - "{{ lookup('file', '~/.ssh/id_ed25519.pub') }}"
 dropbear_port: 1337
