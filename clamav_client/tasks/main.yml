@@ -1,0 +1,70 @@
+---
+- name: Install clamav
+  vars:
+    packages:
+      present:
+      - clamav
+      - clamtk
+  include_role:
+    name: install_packages
+
+- name: Enable OnAccess scanning
+  become: yes
+  lineinfile:
+    path: /etc/clamav/clamd.conf
+    line: '{{ item }}'
+  loop:
+    - OnAccessPrevention yes
+    - OnAccessExcludeUname clamav
+
+- name: Log only on systemd journal
+  become: yes
+  block:
+    - lineinfile:
+        path: /etc/clamav/clamd.conf
+        regexp: '^LogFile\s.*$'
+        state: absent
+    - lineinfile:
+        path: /etc/clamav/freshclam.conf
+        regexp: '^UpdateLogFile\s.*$'
+        state: absent
+
+- name: Configure OnAccess scanning
+  become: yes
+  lineinfile:
+    path: /etc/clamav/clamd.conf
+    line: 'OnAccessIncludePath {{ item }}'
+  loop: '{{ clamavonaccessdirs }}'
+
+- name: Give the AV read access
+  become: yes
+  acl:
+    path: '{{ item }}'
+    entity: clamav
+    etype: user
+    permissions: r-X
+    state: present
+    recursive: no
+  loop: '{{ clamav_read_only_dirs }}'
+
+- name: Give the AV recursive read access
+  become: yes
+  acl:
+    path: '{{ item }}'
+    entity: clamav
+    etype: user
+    permissions: r-X
+    state: present
+    recursive: yes
+  loop: '{{ clamavonaccessdirs }}'
+
+- name: Enable services
+  become: yes
+  service:
+    name: '{{ item }}'
+    state: started
+    enabled: true
+  loop:
+    - clamav-freshclam
+    - clamav-clamonacc
+
