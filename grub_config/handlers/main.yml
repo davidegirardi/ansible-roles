@@ -2,6 +2,5 @@
 - name: Update GRUB configuration
   become: yes
   shell: |
-    update-grub
+    update-grub || grub-mkconfig -o /boot/grub/grub.cfg
   listen: 'update-grub'
-
