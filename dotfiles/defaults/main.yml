@@ -1,10 +1,9 @@
 ---
-# On the left: file/directory inside $DOTFILES
+# On the left: file/directory inside {{ dotfiles_path }}
 # On the right: path in the home directory
 dotfiles:
 
   bashrc: .bashrc
-  bashrc.local.vm: .bashrc.local
   config/nvim/: .config/nvim/
   config/picom.conf: .config/picom.conf
   config/systemd/: .config/systemd/
@@ -16,3 +15,6 @@ dotfiles:
   vim: .vim
   x3270pro.english: .x3270pro
   Xresources: .Xresources
+
+# Defautls to $DOTFILES_PATH
+dotfiles_path: "{{ lookup('env', 'DOTFILES_PATH') }}"

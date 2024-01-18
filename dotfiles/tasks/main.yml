@@ -20,6 +20,6 @@
 - name: Synchronize files
   become: no
   synchronize:
-    src: "{{ lookup('env', 'DOTFILES_PATH') }}/{{ item.key }}"
+    src: "{{ dotfiles_path }}/{{ item.key }}"
     dest: "{{ item.value }}"
   loop: '{{ dotfiles | dict2items }}'
