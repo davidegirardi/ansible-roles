@@ -7,12 +7,12 @@
         - wireguard-tools
   when: ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "Ubuntu"
 
-- name: Select packages for Arch-based distros
+- name: Select packages for Arch and Alpine-based distros
   set_fact:
     local_packages:
       present:
         - wireguard-tools
-  when: ansible_facts['os_family'] == "Archlinux"
+  when: ansible_facts['os_family'] == "Archlinux" or ansible_facts['os_family'] == "Alpine"
 
 - name: Install Wireguard
   vars:
@@ -102,6 +102,7 @@
     owner: root
     group: root
     mode: 0600
+  when: ansible_facts['os_family'] != "Alpine"
 
 - name: Run service
   become: true
@@ -109,6 +110,14 @@
     name: "wg-quick@{{ wg_interface_name }}"
     state: started
     enabled: true
+  when: ansible_facts['os_family'] != "Alpine"
+
+- name: Run service for Alpine
+  become: true
+  shell: 
+    cmd: doas wg-quick up {{ wg_interface_name }}
+    creates: /sys/class/net/wg0/
+  when: ansible_facts['os_family'] == "Alpine"
 
 - name: Save server config
   become: true
