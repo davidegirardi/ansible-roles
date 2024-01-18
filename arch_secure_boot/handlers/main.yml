@@ -1,0 +1,7 @@
+---
+- name: Post-reboot steps. READ THIS!
+  debug:
+    msg:
+      - "Reboot the computer, set it in 'setup mode' and run: {{ etcsecureboot.path }}/runme_once.sh"
+  listen: 'show_post_setup'
+

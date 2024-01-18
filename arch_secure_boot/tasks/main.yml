@@ -173,6 +173,7 @@
       efi-updatevar -f PK.auth PK
   register: newsecurebootscript
   when: trust_pre_existing_secureboot_config
+  notify: 'show_post_setup'
 
 - name: Create post-reboot setup script
   become: yes
@@ -189,10 +190,4 @@
       efi-updatevar -f PK.auth PK
   register: newsecurebootscript
   when: not trust_pre_existing_secureboot_config
-
-- name: Post-reboot steps. READ THIS!
-  debug:
-    msg:
-      - "Reboot the computer, set it in 'setup mode' and run: {{ etcsecureboot.path }}/runme_once.sh"
-  when: newsecurebootscript.changed
-
+  notify: 'show_post_setup'
