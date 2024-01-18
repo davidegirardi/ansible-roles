@@ -1,5 +1,6 @@
 ---
 - name: Empty interfaces file
+  become: yes
   copy:
     content: ""
     dest: /etc/network/interfaces
