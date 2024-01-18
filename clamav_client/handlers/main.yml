@@ -1,0 +1,10 @@
+---
+- name: Restart cla
+  become: yes
+  service:
+    name: '{{ item }}'
+    state: restarted
+  loop:
+    - clamav-freshclam
+    - clamav-clamonacc
+  listen: 'restart_clam_services'

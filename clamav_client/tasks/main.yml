@@ -16,6 +16,7 @@
   loop:
     - OnAccessPrevention yes
     - OnAccessExcludeUname clamav
+  notify: 'restart_clam_services'
 
 - name: Log only on systemd journal
   become: yes
@@ -28,6 +29,7 @@
         path: /etc/clamav/freshclam.conf
         regexp: '^UpdateLogFile\s.*$'
         state: absent
+  notify: 'restart_clam_services'
 
 - name: Configure OnAccess scanning
   become: yes
@@ -35,6 +37,7 @@
     path: /etc/clamav/clamd.conf
     line: 'OnAccessIncludePath {{ item }}'
   loop: '{{ clamavonaccessdirs }}'
+  notify: 'restart_clam_services'
 
 - name: Copy systemd unit
   become: yes
@@ -43,14 +46,16 @@
     src: /usr/lib/systemd/system/clamav-clamonacc.service
     dest: /etc/systemd/system/clamav-clamonacc.service
     mode: 0755
+    force: no
 
 - name: Use fdpass
   become: yes
   lineinfile:
     path: /etc/systemd/system/clamav-clamonacc.service
     backrefs: yes
-    regexp: '(^ExecStart=.*)$'
+    regexp: '(^ExecStart=(?!.*?.--fdpass$).*)$'
     line: '\1 --fdpass'
+  notify: 'restart_clam_services'
 
 - name: Enable services
   become: yes
