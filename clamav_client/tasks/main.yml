@@ -36,27 +36,21 @@
     line: 'OnAccessIncludePath {{ item }}'
   loop: '{{ clamavonaccessdirs }}'
 
-- name: Give the AV read access
+- name: Copy systemd unit
   become: yes
-  acl:
-    path: '{{ item }}'
-    entity: clamav
-    etype: user
-    permissions: r-X
-    state: present
-    recursive: no
-  loop: '{{ clamav_read_only_dirs }}'
+  copy:
+    remote_src: yes
+    src: /usr/lib/systemd/system/clamav-clamonacc.service
+    dest: /etc/systemd/system/clamav-clamonacc.service
+    mode: 0755
 
-- name: Give the AV recursive read access
+- name: Use fdpass
   become: yes
-  acl:
-    path: '{{ item }}'
-    entity: clamav
-    etype: user
-    permissions: r-X
-    state: present
-    recursive: yes
-  loop: '{{ clamavonaccessdirs }}'
+  lineinfile:
+    path: /etc/systemd/system/clamav-clamonacc.service
+    backrefs: yes
+    regexp: '(^ExecStart=.*)$'
+    line: '\1 --fdpass'
 
 - name: Enable services
   become: yes
