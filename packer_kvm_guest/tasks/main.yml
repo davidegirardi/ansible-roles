@@ -1,0 +1,49 @@
+---
+- name: Prepare a VM to be deployed via Terraform
+  vars:
+    locales:
+      - en_US.UTF-8
+    # Generate a random passwords
+    accounts:
+      - "{{ ansible_user_id }}"
+      - root
+    ssh_user: "{{ ansible_user_id }}"
+    services:
+      systemd-timesyncd: started
+  block:
+    - name: randomize_user_password
+      include_role:
+        name: randomize_user_password
+      when: ansible_facts['os_family'] in [ "Archlinux", "Debian",  "Ubuntu" ]
+    - name: locales
+      include_role:
+        name: locales
+      when: ansible_facts['os_family'] in [ "Archlinux" ]
+    - name: upgrade
+      include_role:
+        name: upgrade
+      when: ansible_facts['os_family'] in [ "Debian",  "Ubuntu" ]
+    - name: qemu-agent
+      include_role:
+        name: qemu-agent
+      when: ansible_facts['os_family'] in [ "Archlinux", "Debian",  "Ubuntu" ]
+    - name: cloud-init
+      include_role:
+        name: cloud-init
+      when: ansible_facts['os_family'] in [ "Archlinux", "Debian",  "Ubuntu" ]
+    - name: ssh-key
+      include_role:
+        name: ssh-key
+      when: ansible_facts['os_family'] in [ "Archlinux", "Debian",  "Ubuntu" ]
+    - name: grub_config
+      include_role:
+        name: grub_config
+      when: ansible_facts['os_family'] in [ "Debian",  "Ubuntu" ]
+    - name: replace_networking_with_networkmanager
+      include_role:
+        name: replace_networking_with_networkmanager
+      when: ansible_facts['os_family'] in [ "Debian" ]
+    - name: services
+      include_role:
+        name: services
+      when: ansible_facts['os_family'] in [ "Archlinux", "Debian",  "Ubuntu" ]
