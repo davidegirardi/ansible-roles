@@ -6,5 +6,5 @@ Target = usr/lib/fwupd/efi/fwupdx64.efi
 
 [Action]
 When = PostTransaction
-Exec = /usr/bin/sbsign --key /etc/efikeys/db.key --cert /etc/efikeys/db.crt /usr/lib/fwupd/efi/fwupdx64.efi
+Exec = /usr/bin/sbsign --key /etc/secureboot/db.key --cert /etc/secureboot/db.crt /usr/lib/fwupd/efi/fwupdx64.efi
 Depends = sbsigntools
