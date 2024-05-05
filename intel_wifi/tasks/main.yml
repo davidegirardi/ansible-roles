@@ -2,7 +2,7 @@
 - name: Enable non-free repositories
   become: yes
   apt_repository:
-    repo: deb http://deb.debian.org/debian/ stable main non-free
+    repo: deb http://deb.debian.org/debian/ {{ ansible_distribution_release }} non-free
 
 - name: Install wifi drivers
   become: yes
