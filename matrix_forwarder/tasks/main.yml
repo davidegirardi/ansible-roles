@@ -1,6 +1,6 @@
 ---
 
-- include: iptables.yml
+- include_tasks: iptables.yml
   vars:
     ipversion: 4
 
