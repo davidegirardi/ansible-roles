@@ -14,6 +14,7 @@
           - qemu-kvm
           - qemu-utils
           - spice-client-gtk
+          - systemd-resolved
     - name: Libvirt guests file path
       set_fact:
         libvirt_guest_filename: /etc/default/libvirt-guests
@@ -82,6 +83,15 @@
     line: 'security_driver = "none"'
   notify: 'restart_libvirtd'
   when: ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "Ubuntu"
+
+- name: Use iptables for firewall management
+  become: yes
+  lineinfile:
+    path: /etc/libvirt/network.conf
+    regexp: '^firewall_backend = '
+    line: 'firewall_backend = "iptables"'
+  notify: 'restart_libvirtd'
+  when: ansible_facts['os_family'] == "Archlinux"
 
 - name: Configure libvirt-guests
   become: yes
