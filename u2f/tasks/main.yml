@@ -1,0 +1,43 @@
+---
+- name: Create U2F mapping file
+  become: true
+  copy:
+    dest: "{{ mappings_file }}"
+    content: "{{ u2fmappings | join('\n') }}"
+    owner: root
+    group: root
+    mode: o+rw-x,g+r-wx,o-rwx
+
+- name: Configure sudo
+  become: true
+  pamd:
+    name: sudo
+    type: auth
+    control: include
+    module_path: system-auth
+    state: before
+    new_type: auth
+    new_control: sufficient
+    new_module_path: pam_u2f.so
+    module_arguments: "cue authfile={{ mappings_file }}"
+
+- name: Make sure the polkit config file exist
+  become: true
+  copy:
+    dest: /etc/pam.d/polkit-1
+    src: /usr/lib/pam.d/polkit-1
+    remote_src: true
+    force: false
+
+- name: Configure polkit
+  become: true
+  pamd:
+    name: polkit-1
+    type: auth
+    control: include
+    module_path: system-auth
+    state: before
+    new_type: auth
+    new_control: sufficient
+    new_module_path: pam_u2f.so
+    module_arguments: "cue authfile={{ mappings_file }}"
