@@ -8,11 +8,23 @@
   include_role:
     name: install_packages
 
+- name: Services for Debian-based distros
+  set_fact:
+    cloud_services:
+      - cloud-init
+      - cloud-final
+  when: ansible_facts['os_family'] == "Debian" or ansible_facts['os_family'] == "Ubuntu"
+
+- name: Services for Arch-based distros
+  set_fact:
+    cloud_services:
+      - cloud-init-main
+      - cloud-final
+  when: ansible_facts['os_family'] == "Archlinux"
+
 - name: Enable cloud-init
   become: yes
   service:
     name: '{{ item }}'
     enabled: yes
-  with_items:
-    - cloud-init
-    - cloud-final
+  with_items: "{{ cloud_services }}"
