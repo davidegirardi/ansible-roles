@@ -9,17 +9,17 @@
 - name: Configure listening port
   become: yes
   lineinfile:
-    path: /etc/dropbear-initramfs/config
+    path: /etc/dropbear/initramfs/dropbear.conf
     regexp: '^DROPBEAR_OPTIONS='
     line: 'DROPBEAR_OPTIONS=-p{{ dropbear_port }}'
   notify: 'update-initramfs'
 
 
-- name: Set authorized key taken from default RSA identity
+- name: Set authorized key
   become: yes
   authorized_key:
     user: root
-    path: /etc/dropbear-initramfs/authorized_keys
+    path: /etc/dropbear/initramfs/authorized_keys
     state: present
     key: "{{ item }}"
   notify: 'update-initramfs'
