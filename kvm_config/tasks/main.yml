@@ -27,10 +27,11 @@
         packages:
           present:
             - bridge-utils
+            - cdrtools
             - dnsmasq
-            - libvirt
             - iptables-nft
-            - qemu
+            - libvirt
+            - qemu-full
             - virt-manager
             - virt-viewer
     - name: Libvirt guests file path
@@ -102,6 +103,13 @@
     owner: root
     group: root
     create: yes
+
+- name: Start libvirtd
+  become: yes
+  service:
+    name: "libvirtd.socket"
+    enabled: yes
+    state: started
 
 - name: Start libvirt-guests
   become: yes
