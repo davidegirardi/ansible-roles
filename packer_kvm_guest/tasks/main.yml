@@ -34,7 +34,7 @@
     - name: grub_config
       include_role:
         name: grub_config
-      when: ansible_facts['os_family'] in [ "Debian",  "Ubuntu" ]
+      when: ansible_facts['os_family'] in [ "Archlinux", "Debian",  "Ubuntu" ]
     - name: replace_networking_with_networkmanager
       include_role:
         name: replace_networking_with_networkmanager
