@@ -30,6 +30,8 @@
       - Windows 10
       - Windows 10 LTSB
       - Windows 10, version 1903 and later
+      - Windows 11
     log_path: c:\ansible_wu.txt
     reboot: yes
     reboot_timeout: 1800
+  ignore_errors: true
