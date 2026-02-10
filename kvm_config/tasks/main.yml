@@ -26,7 +26,6 @@
       set_fact:
         packages:
           present:
-            - bridge-utils
             - cdrtools
             - dnsmasq
             - iptables-nft
