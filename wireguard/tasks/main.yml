@@ -91,7 +91,7 @@
       {% for peer in peers | dict2items %}
       [Peer]
       PublicKey = {{ peer.value.public_key }}
-      AllowedIPs = {{ peer.value.allowed_ips }}
+      AllowedIPs = {{ peer.value.allowed_ips | regex_replace('\/\d+$', '/32')}}
       {% endfor %}
 
 - name: Save server config
