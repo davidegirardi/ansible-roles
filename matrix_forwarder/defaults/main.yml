@@ -3,62 +3,82 @@ matrix_in_interface: '{{ hostvars[inventory_hostname]["ansible_default_ipv4"]["i
 matrix_out_interface: '{{ hostvars[inventory_hostname]["ansible_default_ipv4"]["interface"] }}'
 matrix_forwarding_ports:
 
-  HTTP:
-    port: 80
-    protocol: tcp
-    chain: INPUT
-    jump: ACCEPT
-
-  HTTPS:
-    port: 443
-    protocol: tcp
-    chain: INPUT
-    jump: ACCEPT
-
-  Coturn-TURN-TCP:
-    port: 3478
-    protocol: tcp
-    chain: INPUT
-    jump: ACCEPT
-
-  Jitsi-harvester-fallback:
-    port: 4443
-    protocol: tcp
-    chain: INPUT
-    jump: ACCEPT
-
-  Coturn-TURN-TCP-fallback-video-audio:
-    port: 5349
-    protocol: tcp
-    chain: INPUT
-    jump: ACCEPT
-
-  Matrix-federation:
-    port: 8448
-    protocol: tcp
-    chain: INPUT
-    jump: ACCEPT
-
-  Coturn-TURN-UDP:
-    port: 3748
-    protocol: udp
-    chain: INPUT
-    jump: ACCEPT
-
-  Coturn-TURN-video-audio:
-    port: 5349
-    protocol: udp
-    chain: INPUT
-    jump: ACCEPT
-
-  Jitsi-RTP-media:
-    port: 10000
-    protocol: udp
-    chain: INPUT
-    jump: ACCEPT
-
   TURN:
     port: 49152:49172
     protocol: udp
     chain: INPUT
     jump: ACCEPT
+
+  http:
+    chain: INPUT
+    port: 80
+    protocol: tcp
+    jump: ACCEPT
+    state: absent
+
+  https:
+    chain: INPUT
+    port: 443
+    protocol: tcp
+    jump: ACCEPT
+
+  Matrix-federation:
+    chain: INPUT
+    port: 8448
+    protocol: tcp
+    jump: ACCEPT
+
+  pacoloco-arch-mirror:
+    chain: INPUT
+    port: 9129:9129
+    protocol: tcp
+    jump: ACCEPT
+
+  sturn-turn-over-tcp:
+    chain: INPUT
+    port: 3478
+    protocol: tcp
+    jump: ACCEPT
+
+  sturn-turn-over-udp:
+    chain: INPUT
+    port: 3478
+    protocol: udp
+    jump: ACCEPT
+
+  turn-over-tcp:
+    chain: INPUT
+    port: 5349
+    protocol: tcp
+    jump: ACCEPT
+
+  turn-over-udp:
+    chain: INPUT
+    port: 5349
+    protocol: udp
+    jump: ACCEPT
+
+  element-call-ice-tcp:
+    chain: INPUT
+    port: 7881
+    protocol: tcp
+    jump: ACCEPT
+
+  element-call-ice-udp:
+    chain: INPUT
+    port: 7882
+    protocol: udp
+    jump: ACCEPT
+
+  element-call-turn-udp:
+    chain: INPUT
+    port: 3479
+    protocol: udp
+    jump: ACCEPT
+
+  element-call-turn-tcp:
+    chain: INPUT
+    port: 5350
+    protocol: tcp
+    jump: ACCEPT
+
