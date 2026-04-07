@@ -28,7 +28,7 @@
           present:
             - cdrtools
             - dnsmasq
-            - iptables-nft
+            - iptables
             - libvirt
             - qemu-full
             - virt-manager
