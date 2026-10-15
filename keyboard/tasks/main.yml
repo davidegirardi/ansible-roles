@@ -4,6 +4,7 @@
   command: localectl status
   register: localestatus
   changed_when: false
+  check_mode: false
 
 - name: Set X11 keyboard settings
   become: yes
