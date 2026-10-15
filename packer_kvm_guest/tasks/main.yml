@@ -5,9 +5,9 @@
       - en_US.UTF-8
     # Generate a random passwords
     accounts:
-      - "{{ ansible_user_id }}"
+      - "{{ ansible_facts['user_id'] }}"
       - root
-    ssh_user: "{{ ansible_user_id }}"
+    ssh_user: "{{ ansible_facts['user_id'] }}"
     services:
       systemd-timesyncd: started
   block:

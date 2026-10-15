@@ -2,13 +2,13 @@
 - name: Create host directory in home directory
   become: no
   file:
-    path: "{{ ansible_env.HOME }}/host"
+    path: "{{ ansible_facts['env']['HOME'] }}/host"
     state: directory
 
 - name: Mount the filesystem
   become: yes
   mount:
-    path: "{{ ansible_env.HOME }}/host"
+    path: "{{ ansible_facts['env']['HOME'] }}/host"
     src: main
     state: mounted
     fstype: 9p
