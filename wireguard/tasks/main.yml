@@ -88,10 +88,18 @@
       PrivateKey = {{ server_private_key }}
       Address = {{ wg_server_private_address }}
       ListenPort = {{ wg_port }}
+      MTU = {{ wg_mtu }}
+      {% if wg_tcp_mss_clamp_enabled %}
+      # Using || to make the application of rules idempotent from iptables-save
+      PostUp = iptables --wait 5 -t mangle -C FORWARD -o %i -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss {{ wg_tcp_mss }} || iptables --wait 5 -t mangle -A FORWARD -o %i -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss {{ wg_tcp_mss }}
+      PostUp = iptables --wait 5 -t mangle -C FORWARD -i %i -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss {{ wg_tcp_mss }} || iptables --wait 5 -t mangle -A FORWARD -i %i -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss {{ wg_tcp_mss }}
+      PostDown = iptables --wait 5 -t mangle -C FORWARD -o %i -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss {{ wg_tcp_mss }} && iptables --wait 5 -t mangle -D FORWARD -o %i -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss {{ wg_tcp_mss }} || true
+      PostDown = iptables --wait 5 -t mangle -C FORWARD -i %i -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss {{ wg_tcp_mss }} && iptables --wait 5 -t mangle -D FORWARD -i %i -p tcp --tcp-flags SYN,RST SYN -j TCPMSS --set-mss {{ wg_tcp_mss }} || true
+      {% endif %}
       {% for peer in peers | dict2items %}
       [Peer]
       PublicKey = {{ peer.value.public_key }}
-      AllowedIPs = {{ peer.value.allowed_ips | regex_replace('\/\d+$', '/32')}}
+      AllowedIPs = {{ peer.value.allowed_ips | regex_replace('\/\d+$', '/32') }}
       {% endfor %}
 
 - name: Save server config
@@ -102,7 +110,7 @@
     owner: root
     group: root
     mode: 0600
-  when: ansible_facts['os_family'] != "Alpine"
+  notify: 'restart_wireguard'
 
 - name: Run service
   become: true
@@ -118,16 +126,6 @@
     cmd: doas wg-quick up {{ wg_interface_name }}
     creates: /sys/class/net/wg0/
   when: ansible_facts['os_family'] == "Alpine"
-
-- name: Save server config
-  become: true
-  copy:
-    dest: "/etc/wireguard/{{ wg_interface_name }}.conf"
-    content: "{{ server_config }}"
-    owner: root
-    group: root
-    mode: 0600
-  notify: 'restart_wireguard'
 
 - include_tasks: generate_client_config.yml
   loop: "{{ peers | dict2items }}"

@@ -5,3 +5,8 @@ wg_server_public_address: "{{ hostvars[inventory_hostname].inventory_hostname }}
 wg_target_networks: ", 0.0.0.0/0"
 wg_interface_name: wg0
 wg_persistent_keepalive: "PersistentKeepalive = 25"
+# Wireguard has a lower MTU, so we need to mange that to avoid retransmissions
+wg_mtu: 1420
+wg_tcp_mss_clamp_enabled: true
+# ipv4 header 20 bytes + TCP header 20 bytes = 40 bytes
+wg_tcp_mss: "{{ (wg_mtu | int) - 40 }}"
