@@ -1,5 +1,22 @@
 ---
 
+- name: Install sshguard
+  vars:
+    packages:
+      present:
+      - sshguard
+  include_role:
+    name: install_packages
+  when: ansible_distribution_release != "bullseye"
+
+- name: Enable sshguard
+  vars:
+    services:
+      sshguard: started
+  include_role:
+    name: services
+  when: ansible_distribution_release != "bullseye"
+
 - name: Disable ssh password authentication
   become: yes
   lineinfile:
