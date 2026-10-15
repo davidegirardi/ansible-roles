@@ -5,6 +5,9 @@
   pacman:
     update_cache: yes
     upgrade: yes
+  register: result
+  changed_when: (result.packages | default([])) | length > 0
+
 
 - name: Arch Linux install packages
   become: yes
